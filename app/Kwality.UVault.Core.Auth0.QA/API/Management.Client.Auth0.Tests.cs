@@ -50,10 +50,10 @@ using Xunit;
 public sealed class Auth0ManagementClientTests
 {
     private const string testPrefix = "Request an API management token";
-    
+
     private readonly ApiConfiguration apiConfiguration
         = new(new Uri("http://localhost/"), string.Empty, string.Empty, string.Empty);
-    
+
     [Auth0]
     [AutoDomainData]
     [Theory(DisplayName = $"{testPrefix} fails when the REST endpoint can't be requested.")]
