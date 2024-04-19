@@ -22,39 +22,27 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.E2E;
+namespace Kwality.UVault.E2E.App.Models.Operations.Mappers;
 
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Json;
+using Auth0.ManagementApi.Models;
 
-using Kwality.UVault.E2E.App.Builders;
-using Kwality.UVault.E2E.App.Web.Models;
-using Kwality.UVault.QA.Common.Xunit.Traits;
+using Kwality.UVault.Core.Exceptions;
+using Kwality.UVault.Users.Auth0.Operations.Mappers;
+using Kwality.UVault.Users.Operations.Mappers.Abstractions;
 
-using Microsoft.AspNetCore.TestHost;
-
-using Xunit;
-
-[E2E]
-[Auth0]
-[Collection("Auth0")]
-[SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
-public sealed class DefaultTests
+internal sealed class UserCreateOperationMapper(string connection = "Username-Password-Authentication")
+    : Auth0UserCreateOperationMapper
 {
-    [Fact]
-    public async Task CreateUserAsync()
+    protected override UserCreateRequest Map<TSource>(TSource source)
     {
-        // ARRANGE.
-        using var server = new TestServer(E2EApplicationBuilder.CreateApplication());
-        using HttpClient httpClient = server.CreateClient();
+        if (source is UserModel model)
+        {
+            return new UserCreateRequest
+            {
+                Email = model.Key.Value, Connection = connection, Password = model.Password,
+            };
+        }
 
-        // ACT.
-        var userModel = new UserCreateModel("kevin.dconinck@gmail.com", "Kevin", "De Coninck", "MySecur3Passw0rd!!!");
-        using var json = JsonContent.Create(userModel);
-
-        await httpClient.PostAsync(new Uri("/api/v1/users", UriKind.Relative), json)
-                        .ConfigureAwait(true);
-
-        Assert.True(true);
+        throw new CreateException($"Invalid {nameof(IUserOperationMapper)}: Source is NOT `{nameof(UserModel)}`.");
     }
 }

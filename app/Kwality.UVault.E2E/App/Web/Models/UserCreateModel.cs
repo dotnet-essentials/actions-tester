@@ -22,39 +22,12 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.E2E;
+namespace Kwality.UVault.E2E.App.Web.Models;
 
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Json;
-
-using Kwality.UVault.E2E.App.Builders;
-using Kwality.UVault.E2E.App.Web.Models;
-using Kwality.UVault.QA.Common.Xunit.Traits;
-
-using Microsoft.AspNetCore.TestHost;
-
-using Xunit;
-
-[E2E]
-[Auth0]
-[Collection("Auth0")]
-[SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
-public sealed class DefaultTests
+internal sealed class UserCreateModel(string email, string firstName, string lastName, string password)
 {
-    [Fact]
-    public async Task CreateUserAsync()
-    {
-        // ARRANGE.
-        using var server = new TestServer(E2EApplicationBuilder.CreateApplication());
-        using HttpClient httpClient = server.CreateClient();
-
-        // ACT.
-        var userModel = new UserCreateModel("kevin.dconinck@gmail.com", "Kevin", "De Coninck", "MySecur3Passw0rd!!!");
-        using var json = JsonContent.Create(userModel);
-
-        await httpClient.PostAsync(new Uri("/api/v1/users", UriKind.Relative), json)
-                        .ConfigureAwait(true);
-
-        Assert.True(true);
-    }
+    public string Email { get; set; } = email;
+    public string FirstName { get; set; } = firstName;
+    public string LastName { get; set; } = lastName;
+    public string Password { get; set; } = password;
 }

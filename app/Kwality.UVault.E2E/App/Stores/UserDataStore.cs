@@ -22,39 +22,22 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.E2E;
+namespace Kwality.UVault.E2E.App.Stores;
 
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Json;
+using Kwality.UVault.Core.Keys;
+using Kwality.UVault.E2E.App.Db.Context;
+using Kwality.UVault.E2E.App.Db.Entities;
+using Kwality.UVault.E2E.App.Models;
+using Kwality.UVault.Users.Operations.Mappers.Abstractions;
+using Kwality.UVault.Users.Stores.Abstractions;
 
-using Kwality.UVault.E2E.App.Builders;
-using Kwality.UVault.E2E.App.Web.Models;
-using Kwality.UVault.QA.Common.Xunit.Traits;
-
-using Microsoft.AspNetCore.TestHost;
-
-using Xunit;
-
-[E2E]
-[Auth0]
-[Collection("Auth0")]
-[SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
-public sealed class DefaultTests
+internal sealed class UserDataStore(E2EDbContext dbContext) : IUserDataStore<UserData, StringKey>
 {
-    [Fact]
-    public async Task CreateUserAsync()
+    public async Task CreateAsync(StringKey key, UserData data, IUserDataOperationMapper mapper)
     {
-        // ARRANGE.
-        using var server = new TestServer(E2EApplicationBuilder.CreateApplication());
-        using HttpClient httpClient = server.CreateClient();
+        dbContext.Users.Add(new User { ExternalId = key.Value, UserEmail = data.Email });
 
-        // ACT.
-        var userModel = new UserCreateModel("kevin.dconinck@gmail.com", "Kevin", "De Coninck", "MySecur3Passw0rd!!!");
-        using var json = JsonContent.Create(userModel);
-
-        await httpClient.PostAsync(new Uri("/api/v1/users", UriKind.Relative), json)
-                        .ConfigureAwait(true);
-
-        Assert.True(true);
+        await dbContext.SaveChangesAsync()
+                       .ConfigureAwait(false);
     }
 }
