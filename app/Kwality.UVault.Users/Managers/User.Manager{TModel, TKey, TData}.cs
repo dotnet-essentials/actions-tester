@@ -22,66 +22,49 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.Users.Options;
+namespace Kwality.UVault.Users.Managers;
 
 using JetBrains.Annotations;
 
-using Kwality.UVault.Users.Managers;
 using Kwality.UVault.Users.Models;
+using Kwality.UVault.Users.Operations.Mappers.Abstractions;
 using Kwality.UVault.Users.Stores.Abstractions;
 
-using Microsoft.Extensions.DependencyInjection;
-
 [PublicAPI]
-public sealed class UserManagementOptions<TModel, TKey>
+public class UserManager<TModel, TKey, TData>(IUserStore<TModel, TKey> store, IUserDataStore<TData, TKey> dataStore)
     where TModel : UserModel<TKey>
     where TKey : IEquatable<TKey>
+    where TData : class
 {
-    internal UserManagementOptions(IServiceCollection serviceCollection)
+    public Task<TModel> GetByKeyAsync(TKey key)
     {
-        this.ServiceCollection = serviceCollection;
+        return store.GetByKeyAsync(key);
     }
 
-    public IServiceCollection ServiceCollection { get; }
-
-    public void UseManager<TManager>()
-        where TManager : UserManager<TModel, TKey>
+    public Task<IEnumerable<TModel>> GetByEmailAsync(string email)
     {
-        this.ServiceCollection.AddScoped<TManager>();
+        return store.GetByEmailAsync(email);
     }
 
-    public void UseManager<TManager, TData>()
-        where TManager : UserManager<TModel, TKey, TData>
-        where TData : class
+    public async Task<TKey> CreateAsync(
+        TModel model, TData data, IUserOperationMapper mapper, IUserDataOperationMapper dataMapper)
     {
-        this.ServiceCollection.AddScoped<TManager>();
+        TKey key = await store.CreateAsync(model, mapper)
+                              .ConfigureAwait(false);
+
+        await dataStore.CreateAsync(key, data, dataMapper)
+                       .ConfigureAwait(false);
+
+        return key;
     }
 
-    public void UseStore<TStore>()
-        where TStore : class, IUserStore<TModel, TKey>
+    public Task UpdateAsync(TKey key, TModel model, IUserOperationMapper mapper)
     {
-        this.ServiceCollection.AddScoped<IUserStore<TModel, TKey>, TStore>();
+        return store.UpdateAsync(key, model, mapper);
     }
 
-    public void UseStore<TStore>(ServiceLifetime serviceLifetime)
-        where TStore : class, IUserStore<TModel, TKey>
+    public Task DeleteByKeyAsync(TKey key)
     {
-        this.ServiceCollection.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(TStore),
-            serviceLifetime));
-    }
-
-    public void UseDataStore<TDataStore, TData>()
-        where TDataStore : class, IUserDataStore<TData, TKey>
-        where TData : class
-    {
-        this.ServiceCollection.AddScoped<IUserDataStore<TData, TKey>, TDataStore>();
-    }
-
-    public void UseDataStore<TDataStore, TData>(ServiceLifetime serviceLifetime)
-        where TDataStore : class, IUserDataStore<TData, TKey>
-        where TData : class
-    {
-        this.ServiceCollection.Add(new ServiceDescriptor(typeof(IUserDataStore<TData, TKey>), typeof(TDataStore),
-            serviceLifetime));
+        return store.DeleteByKeyAsync(key);
     }
 }

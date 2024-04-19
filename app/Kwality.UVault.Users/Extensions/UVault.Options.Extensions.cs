@@ -67,4 +67,37 @@ public static class UVaultOptionsExtensions
         // Configure UVault's User Management component.
         action?.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
     }
+
+    public static void UseUserManagement<TModel, TKey, TData>(this UVaultOptions options)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TData : class
+    {
+        options.UseUserManagement<TModel, TKey, TData>(null);
+    }
+
+    public static void UseUserManagement<TModel, TKey, TData>(this UVaultOptions options, ServiceLifetime storeLifetime)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TData : class
+    {
+        options.UseUserManagement<TModel, TKey, TData>(null, storeLifetime);
+    }
+
+    public static void UseUserManagement<TModel, TKey, TData>(
+        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>>? action,
+        ServiceLifetime storeLifetime = ServiceLifetime.Scoped)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TData : class
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        options.Services.AddScoped<UserManager<TModel, TKey, TData>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
+
+        // Configure UVault's User Management component.
+        action?.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
+    }
 }
