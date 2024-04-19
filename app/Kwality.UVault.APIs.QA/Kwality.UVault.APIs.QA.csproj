@@ -40,14 +40,4 @@
     <ProjectReference Include="..\Kwality.UVault.QA.Common\Kwality.UVault.QA.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TestResults\0de3fc3b-24ef-431a-b10e-c13abf27383f\" />
-    <Folder Include="TestResults\74a809d5-d9af-4ce1-b131-5f6701b1394d\" />
-    <Folder Include="TestResults\afc2c388-418e-4329-8b9e-dd07fec24f40\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="TestResults\afc2c388-418e-4329-8b9e-dd07fec24f40\coverage.cobertura.xml" />
-  </ItemGroup>
-
 </Project>

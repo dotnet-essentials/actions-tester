@@ -40,9 +40,4 @@
     <ProjectReference Include="..\Kwality.UVault.QA.Common\Kwality.UVault.QA.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TestResults\4cf1c685-1650-4254-9902-beaacabddf42\" />
-    <Folder Include="TestResults\63a59f9c-41f3-429b-bfc4-c61ab3f0171b\" />
-  </ItemGroup>
-
 </Project>

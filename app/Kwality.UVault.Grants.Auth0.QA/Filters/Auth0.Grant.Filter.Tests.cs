@@ -41,15 +41,14 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class Auth0GrantFilterTests
 {
+    private readonly GrantFilter filter = new();
+
     [GrantManagement]
     [Fact(DisplayName = "Map to an invalid destination raises an exception.")]
     internal void Map_InvalidDestination_RaisesException()
     {
-        // ARRANGE.
-        var mapper = new GrantFilter();
-
         // ACT.
-        Action act = () => mapper.Create<Expression<Func<string, bool>>>();
+        Action act = () => this.filter.Create<Expression<Func<string, bool>>>();
 
         // ASSERT.
         act.Should()
@@ -61,11 +60,8 @@ public sealed class Auth0GrantFilterTests
     [Fact(DisplayName = "Map succeeds.")]
     internal void Map_Succeeds()
     {
-        // ARRANGE.
-        var mapper = new GrantFilter();
-
         // ACT.
-        var result = mapper.Create<GetClientGrantsRequest>();
+        var result = this.filter.Create<GetClientGrantsRequest>();
 
         // ASSERT.
         result.Should()

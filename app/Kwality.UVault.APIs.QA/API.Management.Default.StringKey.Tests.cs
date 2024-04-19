@@ -35,7 +35,7 @@ using JetBrains.Annotations;
 using Kwality.UVault.APIs.Managers;
 using Kwality.UVault.APIs.Models;
 using Kwality.UVault.APIs.Operations.Mappers;
-using Kwality.UVault.APIs.QA.Factories;
+using Kwality.UVault.APIs.QA.Internal.Factories;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.QA.Common.Xunit.Traits;
@@ -45,16 +45,15 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class ApiManagementDefaultStringKeyTests
 {
+    private readonly ApiManager<Model, StringKey> manager = new ApiManagerFactory().Create<Model, StringKey>();
+
     [AutoData]
     [ApiManagement]
     [Theory(DisplayName = "Get by key raises an exception when the key is NOT found.")]
     internal async Task GetByKey_UnknownKey_RaisesException(StringKey key)
     {
-        // ARRANGE.
-        ApiManager<Model, StringKey> manager = new ApiManagerFactory().Create<Model, StringKey>();
-
         // ACT.
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.manager.GetByKeyAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -69,15 +68,13 @@ public sealed class ApiManagementDefaultStringKeyTests
     internal async Task Create_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiManager<Model, StringKey> manager = new ApiManagerFactory().Create<Model, StringKey>();
-
-        StringKey key = await manager.CreateAsync(model, new CreateOperationMapper())
-                                     .ConfigureAwait(true);
+        StringKey key = await this.manager.CreateAsync(model, new CreateOperationMapper())
+                                  .ConfigureAwait(true);
 
         // ASSERT.
-        (await manager.GetByKeyAsync(key)
-                      .ConfigureAwait(true)).Should()
-                                            .BeEquivalentTo(model);
+        (await this.manager.GetByKeyAsync(key)
+                   .ConfigureAwait(true)).Should()
+                                         .BeEquivalentTo(model);
     }
 
     [AutoData]
@@ -85,15 +82,12 @@ public sealed class ApiManagementDefaultStringKeyTests
     [Theory(DisplayName = "Delete succeeds when the key is not found.")]
     internal async Task Delete_UnknownKey_Succeeds(StringKey key)
     {
-        // ARRANGE.
-        ApiManager<Model, StringKey> manager = new ApiManagerFactory().Create<Model, StringKey>();
-
         // ACT.
-        await manager.DeleteByKeyAsync(key)
-                     .ConfigureAwait(true);
+        await this.manager.DeleteByKeyAsync(key)
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.manager.GetByKeyAsync(key);
 
         await act.Should()
                  .ThrowAsync<ReadException>()
@@ -107,17 +101,15 @@ public sealed class ApiManagementDefaultStringKeyTests
     internal async Task Delete_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiManager<Model, StringKey> manager = new ApiManagerFactory().Create<Model, StringKey>();
-
-        StringKey key = await manager.CreateAsync(model, new CreateOperationMapper())
-                                     .ConfigureAwait(true);
+        StringKey key = await this.manager.CreateAsync(model, new CreateOperationMapper())
+                                  .ConfigureAwait(true);
 
         // ACT.
-        await manager.DeleteByKeyAsync(key)
-                     .ConfigureAwait(true);
+        await this.manager.DeleteByKeyAsync(key)
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.manager.GetByKeyAsync(key);
 
         await act.Should()
                  .ThrowAsync<ReadException>()

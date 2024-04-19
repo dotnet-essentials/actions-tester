@@ -38,7 +38,7 @@ using Kwality.UVault.APIs.Extensions;
 using Kwality.UVault.APIs.Managers;
 using Kwality.UVault.APIs.Models;
 using Kwality.UVault.APIs.Operations.Mappers.Abstractions;
-using Kwality.UVault.APIs.QA.Factories;
+using Kwality.UVault.APIs.QA.Internal.Factories;
 using Kwality.UVault.APIs.Stores.Abstractions;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Extensions;

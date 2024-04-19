@@ -40,7 +40,7 @@ using Kwality.UVault.Grants.Managers;
 using Kwality.UVault.Grants.Models;
 using Kwality.UVault.Grants.Operations.Filters.Abstractions;
 using Kwality.UVault.Grants.Operations.Mappers;
-using Kwality.UVault.Grants.QA.Factories;
+using Kwality.UVault.Grants.QA.Internal.Factories;
 using Kwality.UVault.QA.Common.Xunit.Traits;
 
 using Xunit;
@@ -48,20 +48,20 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class GrantManagementDefaultStringKeyTests
 {
+    private readonly GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
+
     [AutoData]
     [GrantManagement]
     [Theory(DisplayName = "Get all (pageIndex: 0, all data showed) succeeds.")]
     internal async Task GetAll_FirstPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
-
-        await manager.CreateAsync(model, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(model, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(0, 10)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(0, 10)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -83,14 +83,12 @@ public sealed class GrantManagementDefaultStringKeyTests
     internal async Task GetAll_SecondPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
-
-        await manager.CreateAsync(model, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(model, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(1, 10)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(1, 10)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -107,17 +105,15 @@ public sealed class GrantManagementDefaultStringKeyTests
     internal async Task GetAll_FirstPageWhenNotAllDataShowed_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
+        await this.manager.CreateAsync(modelOne, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelOne, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
-
-        await manager.CreateAsync(modelTwo, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(modelTwo, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(0, 1)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(0, 1)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -139,17 +135,15 @@ public sealed class GrantManagementDefaultStringKeyTests
     internal async Task GetAll_SecondPageWhenNotAllDataShowed_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
+        await this.manager.CreateAsync(modelOne, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelOne, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
-
-        await manager.CreateAsync(modelTwo, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(modelTwo, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(1, 1)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(1, 1)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -171,16 +165,14 @@ public sealed class GrantManagementDefaultStringKeyTests
     internal async Task GetAll_WithFilter_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
+        await this.manager.CreateAsync(modelOne, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelOne, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(modelTwo, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelTwo, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
-
-        PagedResultSet<Model> result = await manager.GetAllAsync(0, 10, new OperationFilter(modelTwo.Scopes))
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(0, 10, new OperationFilter(modelTwo.Scopes))
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.ResultSet.Count()
@@ -197,17 +189,14 @@ public sealed class GrantManagementDefaultStringKeyTests
     [Theory(DisplayName = "Create succeeds.")]
     internal async Task Create_Succeeds(Model model)
     {
-        // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
-
         // ACT.
-        await manager.CreateAsync(model, new GrantCreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(model, new GrantCreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        (await manager.GetAllAsync(0, 100)
-                      .ConfigureAwait(true)).ResultSet.Should()
-                                            .ContainEquivalentOf(model);
+        (await this.manager.GetAllAsync(0, 100)
+                   .ConfigureAwait(true)).ResultSet.Should()
+                                         .ContainEquivalentOf(model);
     }
 
     [AutoData]
@@ -216,26 +205,24 @@ public sealed class GrantManagementDefaultStringKeyTests
     internal async Task Update_Succeeds(Model model)
     {
         // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
-
-        StringKey key = await manager.CreateAsync(model, new GrantCreateOperationMapper())
-                                     .ConfigureAwait(true);
+        StringKey key = await this.manager.CreateAsync(model, new GrantCreateOperationMapper())
+                                  .ConfigureAwait(true);
 
         // ACT.
         model.Scopes = new[] { "newScope", "newScope2" };
 
-        await manager.UpdateAsync(key, model, new GrantUpdateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.UpdateAsync(key, model, new GrantUpdateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        (await manager.GetAllAsync(0, 100)
-                      .ConfigureAwait(true)).ResultSet.Count()
-                                            .Should()
-                                            .Be(1);
+        (await this.manager.GetAllAsync(0, 100)
+                   .ConfigureAwait(true)).ResultSet.Count()
+                                         .Should()
+                                         .Be(1);
 
-        (await manager.GetAllAsync(0, 100)
-                      .ConfigureAwait(true)).ResultSet.Should()
-                                            .ContainEquivalentOf(model);
+        (await this.manager.GetAllAsync(0, 100)
+                   .ConfigureAwait(true)).ResultSet.Should()
+                                         .ContainEquivalentOf(model);
     }
 
     [AutoData]
@@ -243,11 +230,8 @@ public sealed class GrantManagementDefaultStringKeyTests
     [Theory(DisplayName = "Update raises an exception when the key is not found.")]
     internal async Task Update_UnknownKey_RaisesException(StringKey key, Model model)
     {
-        // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
-
         // ACT.
-        Func<Task> act = () => manager.UpdateAsync(key, model, new GrantUpdateOperationMapper());
+        Func<Task> act = () => this.manager.UpdateAsync(key, model, new GrantUpdateOperationMapper());
 
         // ASSERT.
         await act.Should()
@@ -262,19 +246,17 @@ public sealed class GrantManagementDefaultStringKeyTests
     internal async Task Delete_Succeeds(Model model)
     {
         // ARRANGE.
-        GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
-
-        StringKey key = await manager.CreateAsync(model, new GrantCreateOperationMapper())
-                                     .ConfigureAwait(true);
+        StringKey key = await this.manager.CreateAsync(model, new GrantCreateOperationMapper())
+                                  .ConfigureAwait(true);
 
         // ACT.
-        await manager.DeleteByKeyAsync(key)
-                     .ConfigureAwait(true);
+        await this.manager.DeleteByKeyAsync(key)
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        (await manager.GetAllAsync(0, 100)
-                      .ConfigureAwait(true)).ResultSet.Should()
-                                            .BeEmpty();
+        (await this.manager.GetAllAsync(0, 100)
+                   .ConfigureAwait(true)).ResultSet.Should()
+                                         .BeEmpty();
     }
 
     [AutoData]
@@ -282,11 +264,8 @@ public sealed class GrantManagementDefaultStringKeyTests
     [Theory(DisplayName = "Delete succeeds when the key is not found.")]
     internal async Task Delete_UnknownKey_Succeeds(StringKey key)
     {
-        // ARRANGE.
-        GrantManager<Model, StringKey> userManager = new GrantManagerFactory().Create<Model, StringKey>();
-
         // ACT.
-        Func<Task> act = () => userManager.DeleteByKeyAsync(key);
+        Func<Task> act = () => this.manager.DeleteByKeyAsync(key);
 
         // ASSERT.
         await act.Should()

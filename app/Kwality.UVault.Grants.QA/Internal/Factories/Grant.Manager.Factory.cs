@@ -22,38 +22,37 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.APIs.QA.Factories;
+namespace Kwality.UVault.Grants.QA.Internal.Factories;
 
-using Kwality.UVault.APIs.Extensions;
-using Kwality.UVault.APIs.Managers;
-using Kwality.UVault.APIs.Models;
-using Kwality.UVault.APIs.Options;
 using Kwality.UVault.Core.Extensions;
+using Kwality.UVault.Grants.Extensions;
+using Kwality.UVault.Grants.Managers;
+using Kwality.UVault.Grants.Models;
+using Kwality.UVault.Grants.Options;
 
 using Microsoft.Extensions.DependencyInjection;
 
-internal sealed class ApiManagerFactory
+internal sealed class GrantManagerFactory
 {
     private readonly IServiceCollection serviceCollection = new ServiceCollection();
 
-    public ApiManager<TModel, TKey> Create<TModel, TKey>()
-        where TModel : ApiModel<TKey>
+    public GrantManager<TModel, TKey> Create<TModel, TKey>()
+        where TModel : GrantModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        this.serviceCollection.AddUVault(static options =>
-            options.UseApiManagement<TModel, TKey>(ServiceLifetime.Scoped));
+        this.serviceCollection.AddUVault(static options => options.UseGrantManagement<TModel, TKey>());
 
         return this.serviceCollection.BuildServiceProvider()
-                   .GetRequiredService<ApiManager<TModel, TKey>>();
+                   .GetRequiredService<GrantManager<TModel, TKey>>();
     }
 
-    public ApiManager<TModel, TKey> Create<TModel, TKey>(Action<ApiManagementOptions<TModel, TKey>>? action)
-        where TModel : ApiModel<TKey>
+    public GrantManager<TModel, TKey> Create<TModel, TKey>(Action<GrantManagementOptions<TModel, TKey>>? action)
+        where TModel : GrantModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        this.serviceCollection.AddUVault(options => options.UseApiManagement(action));
+        this.serviceCollection.AddUVault(options => options.UseGrantManagement(action));
 
         return this.serviceCollection.BuildServiceProvider()
-                   .GetRequiredService<ApiManager<TModel, TKey>>();
+                   .GetRequiredService<GrantManager<TModel, TKey>>();
     }
 }
