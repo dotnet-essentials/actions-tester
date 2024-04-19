@@ -72,11 +72,11 @@ internal sealed class ApiStore<TModel>(
 
     private async Task<TModel> GetByKeyInternalAsync(StringKey key)
     {
-        using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
-                                                        .ConfigureAwait(false);
-
         try
         {
+            using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
+                                                            .ConfigureAwait(false);
+
             ResourceServer? resourceServer = await apiClient.ResourceServers.GetAsync(key.Value)
                                                             .ConfigureAwait(false);
 
@@ -115,11 +115,11 @@ internal sealed class ApiStore<TModel>(
 
     private async Task<StringKey> CreateInternalAsync(TModel model, IApiOperationMapper mapper)
     {
-        using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
-                                                        .ConfigureAwait(false);
-
         try
         {
+            using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
+                                                            .ConfigureAwait(false);
+
             ResourceServer resourceServer = await apiClient
                                                   .ResourceServers.CreateAsync(
                                                       mapper.Create<TModel, ResourceServerCreateRequest>(model))
@@ -160,11 +160,11 @@ internal sealed class ApiStore<TModel>(
 
     private async Task DeleteByKeyInternalAsync(StringKey key)
     {
-        using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
-                                                        .ConfigureAwait(false);
-
         try
         {
+            using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
+                                                            .ConfigureAwait(false);
+
             await apiClient.ResourceServers.DeleteAsync(key.Value)
                            .ConfigureAwait(false);
         }
