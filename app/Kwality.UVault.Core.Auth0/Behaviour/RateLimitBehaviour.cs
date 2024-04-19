@@ -22,9 +22,10 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.QA.Common.Properties;
+namespace Kwality.UVault.Core.Auth0.Behaviour;
 
-public static class Delays
+public enum RateLimitBehaviour
 {
-    public const int Auth0RateLimitDelay = 2000;
+    Fail = 0,
+    Retry = 1,
 }

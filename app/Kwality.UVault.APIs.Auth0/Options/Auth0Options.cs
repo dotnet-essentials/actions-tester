@@ -1,4 +1,4 @@
-// =====================================================================================================================
+﻿// =====================================================================================================================
 // = LICENSE:       Copyright (c) 2023 Kevin De Coninck
 // =
 // =                Permission is hereby granted, free of charge, to any person
@@ -22,39 +22,17 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.M2M.Auth0.Extensions;
+namespace Kwality.UVault.APIs.Auth0.Options;
 
 using JetBrains.Annotations;
 
-using Kwality.UVault.Core.Auth0.API.Clients;
-using Kwality.UVault.Core.System;
-using Kwality.UVault.Core.System.Abstractions;
-using Kwality.UVault.M2M.Auth0.Configuration;
-using Kwality.UVault.M2M.Auth0.Mapping.Abstractions;
-using Kwality.UVault.M2M.Auth0.Options;
-using Kwality.UVault.M2M.Auth0.Stores;
-using Kwality.UVault.M2M.Models;
-using Kwality.UVault.M2M.Options;
-
-using Microsoft.Extensions.DependencyInjection;
+using Kwality.UVault.Core.Auth0.Behaviour;
 
 [PublicAPI]
-public static class ApplicationTokenManagementOptionsExtensions
+public sealed class Auth0Options
 {
-    public static void UseAuth0Store<TToken, TMapper>(
-        this ApplicationTokenManagementOptions<TToken> options, M2MConfiguration configuration,
-        Func<Auth0Options>? auth0Options = null)
-        where TToken : TokenModel
-        where TMapper : class, IModelTokenMapper<TToken>
-    {
-        ArgumentNullException.ThrowIfNull(options);
-        options.UseStore<ApplicationTokenStore<TToken>>();
-        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options?.Invoke() ?? new Auth0Options());
-
-        // Register additional services.
-        options.ServiceCollection.AddScoped<IModelTokenMapper<TToken>, TMapper>();
-        options.ServiceCollection.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        options.ServiceCollection.AddHttpClient<ManagementClient>();
-        options.ServiceCollection.AddSingleton(configuration);
-    }
+    public RateLimitBehaviour RateLimitBehaviour { get; init; } = RateLimitBehaviour.Fail;
+    public TimeSpan RateLimitRetryInterval { get; init; } = TimeSpan.FromSeconds(1);
+    public int RateLimitMaxRetryCount { get; init; } = 5;
+    internal int RetryCount { get; set; }
 }

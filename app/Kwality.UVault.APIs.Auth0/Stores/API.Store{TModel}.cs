@@ -24,6 +24,7 @@
 // =====================================================================================================================
 namespace Kwality.UVault.APIs.Auth0.Stores;
 
+using global::Auth0.Core.Exceptions;
 using global::Auth0.ManagementApi;
 using global::Auth0.ManagementApi.Models;
 
@@ -31,9 +32,11 @@ using JetBrains.Annotations;
 
 using Kwality.UVault.APIs.Auth0.Mapping.Abstractions;
 using Kwality.UVault.APIs.Auth0.Models;
+using Kwality.UVault.APIs.Auth0.Options;
 using Kwality.UVault.APIs.Operations.Mappers.Abstractions;
 using Kwality.UVault.APIs.Stores.Abstractions;
 using Kwality.UVault.Core.Auth0.API.Clients;
+using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Keys;
@@ -42,10 +45,32 @@ using Kwality.UVault.Core.Keys;
 internal sealed class ApiStore<TModel>(
     ManagementClient client,
     ApiConfiguration configuration,
-    IModelMapper<TModel> modelMapper) : IApiStore<TModel, StringKey>
+    IModelMapper<TModel> modelMapper,
+    Auth0Options options) : IApiStore<TModel, StringKey>
     where TModel : ApiModel
 {
-    public async Task<TModel> GetByKeyAsync(StringKey key)
+    public Task<TModel> GetByKeyAsync(StringKey key)
+    {
+        options.RetryCount = 0;
+
+        return this.GetByKeyInternalAsync(key);
+    }
+
+    public Task<StringKey> CreateAsync(TModel model, IApiOperationMapper mapper)
+    {
+        options.RetryCount = 0;
+
+        return this.CreateInternalAsync(model, mapper);
+    }
+
+    public Task DeleteByKeyAsync(StringKey key)
+    {
+        options.RetryCount = 0;
+
+        return this.DeleteByKeyInternalAsync(key);
+    }
+
+    private async Task<TModel> GetByKeyInternalAsync(StringKey key)
     {
         using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
                                                         .ConfigureAwait(false);
@@ -57,13 +82,38 @@ internal sealed class ApiStore<TModel>(
 
             return modelMapper.Map(resourceServer);
         }
+        catch (RateLimitApiException ex)
+        {
+            switch (options.RateLimitBehaviour)
+            {
+                case RateLimitBehaviour.Fail:
+                    throw new ReadException($"Failed to read API: `{key}`.", ex);
+
+                case RateLimitBehaviour.Retry:
+                    if (options.RetryCount > options.RateLimitMaxRetryCount)
+                    {
+                        throw new ReadException($"Failed to read API: `{key}`.", ex);
+                    }
+
+                    options.RetryCount += 1;
+
+                    await Task.Delay(options.RateLimitRetryInterval)
+                              .ConfigureAwait(false);
+
+                    return await this.GetByKeyInternalAsync(key)
+                                     .ConfigureAwait(false);
+
+                default:
+                    throw new ReadException($"Failed to read API: `{key}`.", ex);
+            }
+        }
         catch (Exception ex)
         {
             throw new ReadException($"Failed to read API: `{key}`.", ex);
         }
     }
 
-    public async Task<StringKey> CreateAsync(TModel model, IApiOperationMapper mapper)
+    private async Task<StringKey> CreateInternalAsync(TModel model, IApiOperationMapper mapper)
     {
         using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
                                                         .ConfigureAwait(false);
@@ -77,13 +127,38 @@ internal sealed class ApiStore<TModel>(
 
             return new StringKey(resourceServer.Id);
         }
+        catch (RateLimitApiException ex)
+        {
+            switch (options.RateLimitBehaviour)
+            {
+                case RateLimitBehaviour.Fail:
+                    throw new ReadException("Failed to create API.", ex);
+
+                case RateLimitBehaviour.Retry:
+                    if (options.RetryCount > options.RateLimitMaxRetryCount)
+                    {
+                        throw new ReadException("Failed to create API.", ex);
+                    }
+
+                    options.RetryCount += 1;
+
+                    await Task.Delay(options.RateLimitRetryInterval)
+                              .ConfigureAwait(false);
+
+                    return await this.CreateInternalAsync(model, mapper)
+                                     .ConfigureAwait(false);
+
+                default:
+                    throw new ReadException("Failed to create API.", ex);
+            }
+        }
         catch (Exception ex)
         {
             throw new CreateException("Failed to create API.", ex);
         }
     }
 
-    public async Task DeleteByKeyAsync(StringKey key)
+    private async Task DeleteByKeyInternalAsync(StringKey key)
     {
         using ManagementApiClient apiClient = await this.CreateManagementApiClientAsync()
                                                         .ConfigureAwait(false);
@@ -92,6 +167,33 @@ internal sealed class ApiStore<TModel>(
         {
             await apiClient.ResourceServers.DeleteAsync(key.Value)
                            .ConfigureAwait(false);
+        }
+        catch (RateLimitApiException ex)
+        {
+            switch (options.RateLimitBehaviour)
+            {
+                case RateLimitBehaviour.Fail:
+                    throw new ReadException($"Failed to delete API: `{key}`.", ex);
+
+                case RateLimitBehaviour.Retry:
+                    if (options.RetryCount > options.RateLimitMaxRetryCount)
+                    {
+                        throw new ReadException($"Failed to delete API: `{key}`.", ex);
+                    }
+
+                    options.RetryCount += 1;
+
+                    await Task.Delay(options.RateLimitRetryInterval)
+                              .ConfigureAwait(false);
+
+                    await this.DeleteByKeyInternalAsync(key)
+                              .ConfigureAwait(false);
+
+                    break;
+
+                default:
+                    throw new ReadException($"Failed to delete API: `{key}`.", ex);
+            }
         }
         catch (Exception ex)
         {

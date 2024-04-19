@@ -33,6 +33,7 @@ using Kwality.UVault.Core.System;
 using Kwality.UVault.Core.System.Abstractions;
 using Kwality.UVault.M2M.Auth0.Mapping.Abstractions;
 using Kwality.UVault.M2M.Auth0.Models;
+using Kwality.UVault.M2M.Auth0.Options;
 using Kwality.UVault.M2M.Auth0.Stores;
 using Kwality.UVault.M2M.Options;
 
@@ -42,12 +43,14 @@ using Microsoft.Extensions.DependencyInjection;
 public static class ApplicationManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(
-        this ApplicationManagementOptions<TModel, StringKey> options, ApiConfiguration configuration)
+        this ApplicationManagementOptions<TModel, StringKey> options, ApiConfiguration configuration,
+        Func<Auth0Options>? auth0Options = null)
         where TModel : ApplicationModel
         where TMapper : class, IModelMapper<TModel>
     {
         ArgumentNullException.ThrowIfNull(options);
         options.UseStore<ApplicationStore<TModel>>();
+        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options?.Invoke() ?? new Auth0Options());
 
         // Register additional services.
         options.ServiceCollection.AddScoped<IModelMapper<TModel>, TMapper>();

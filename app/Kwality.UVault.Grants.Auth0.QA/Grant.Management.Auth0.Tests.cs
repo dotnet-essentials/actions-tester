@@ -34,6 +34,7 @@ using global::Auth0.ManagementApi.Models;
 
 using JetBrains.Annotations;
 
+using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Keys;
@@ -43,6 +44,7 @@ using Kwality.UVault.Grants.Auth0.Mapping.Abstractions;
 using Kwality.UVault.Grants.Auth0.Models;
 using Kwality.UVault.Grants.Auth0.Operations.Filters;
 using Kwality.UVault.Grants.Auth0.Operations.Mappers;
+using Kwality.UVault.Grants.Auth0.Options;
 using Kwality.UVault.Grants.Auth0.QA.Internal.Factories;
 using Kwality.UVault.Grants.Managers;
 using Kwality.UVault.Grants.Operations.Mappers.Abstractions;
@@ -51,12 +53,26 @@ using Kwality.UVault.QA.Common.Xunit.Traits;
 
 using Xunit;
 
-using static UVault.QA.Common.Properties.Delays;
-
 [Collection("Auth0")]
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class GrantManagementAuth0Tests
 {
+    private readonly GrantManager<Model, StringKey> grantManager;
+
+    public GrantManagementAuth0Tests()
+    {
+        ApiConfiguration apiConfiguration = GetApiConfiguration();
+
+        this.grantManager = new GrantManagerFactory().Create<Model, StringKey>(options =>
+            options.UseAuth0Store<Model, ModelMapper>(apiConfiguration,
+                static () => new Auth0Options
+                {
+                    RateLimitBehaviour = RateLimitBehaviour.Retry,
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitMaxRetryCount = 5,
+                }));
+    }
+
     [AutoData]
     [GrantManagement]
     [Auth0]
@@ -64,31 +80,17 @@ public sealed class GrantManagementAuth0Tests
     internal async Task GetAll_FirstPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model,
-                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                               .ConfigureAwait(true);
+            key = await this.grantManager.CreateAsync(model,
+                                new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                            .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager.GetAllAsync(0, 3)
-                                                        .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this.grantManager.GetAllAsync(0, 3)
+                                                     .ConfigureAwait(true);
 
             // ASSERT.
             result.HasNextPage.Should()
@@ -110,12 +112,8 @@ public sealed class GrantManagementAuth0Tests
             // Cleanup: Remove the client grant in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -127,31 +125,17 @@ public sealed class GrantManagementAuth0Tests
     internal async Task GetAll_SecondPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model,
-                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                               .ConfigureAwait(true);
+            key = await this.grantManager.CreateAsync(model,
+                                new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                            .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager.GetAllAsync(1, 10)
-                                                        .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this.grantManager.GetAllAsync(1, 10)
+                                                     .ConfigureAwait(true);
 
             // ASSERT.
             result.HasNextPage.Should()
@@ -166,12 +150,8 @@ public sealed class GrantManagementAuth0Tests
             // Cleanup: Remove the client grant in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -183,36 +163,22 @@ public sealed class GrantManagementAuth0Tests
     internal async Task GetAll_SecondPageWhenNotAllDataShowed_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? keyOne = null;
         StringKey? keyTwo = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
+            keyOne = await this.grantManager.CreateAsync(modelOne,
+                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                               .ConfigureAwait(true);
 
-            keyOne = await manager.CreateAsync(modelOne,
-                                      new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                                  .ConfigureAwait(true);
-
-            keyTwo = await manager.CreateAsync(modelTwo,
-                                      new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_2_CLIENT_ID))
-                                  .ConfigureAwait(true);
+            keyTwo = await this.grantManager.CreateAsync(modelTwo,
+                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_2_CLIENT_ID))
+                               .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager.GetAllAsync(1, 1)
-                                                        .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this.grantManager.GetAllAsync(1, 1)
+                                                     .ConfigureAwait(true);
 
             // ASSERT.
             result.HasNextPage.Should()
@@ -233,22 +199,14 @@ public sealed class GrantManagementAuth0Tests
             // Cleanup: Remove the client grants in Auth0.
             if (keyOne != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(keyOne)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(keyOne)
-                             .ConfigureAwait(true);
             }
 
             if (keyTwo != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(keyTwo)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(keyTwo)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -260,36 +218,24 @@ public sealed class GrantManagementAuth0Tests
     internal async Task GetAll_WithFilter_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? keyOne = null;
         StringKey? keyTwo = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
+            keyOne = await this.grantManager.CreateAsync(modelOne,
+                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                               .ConfigureAwait(true);
 
-            keyOne = await manager.CreateAsync(modelOne,
-                                      new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                                  .ConfigureAwait(true);
-
-            keyTwo = await manager.CreateAsync(modelTwo,
-                                      new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_2_CLIENT_ID))
-                                  .ConfigureAwait(true);
+            keyTwo = await this.grantManager.CreateAsync(modelTwo,
+                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_2_CLIENT_ID))
+                               .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager.GetAllAsync(0, 10, new OperationFilter(modelTwo.Audience))
-                                                        .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this
+                                                 .grantManager.GetAllAsync(0, 10,
+                                                     new OperationFilter(modelTwo.Audience))
+                                                 .ConfigureAwait(true);
 
             // ASSERT.
             result.ResultSet.Count()
@@ -307,22 +253,14 @@ public sealed class GrantManagementAuth0Tests
             // Cleanup: Remove the client grants in Auth0.
             if (keyOne != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(keyOne)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(keyOne)
-                             .ConfigureAwait(true);
             }
 
             if (keyTwo != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(keyTwo)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(keyTwo)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -334,46 +272,28 @@ public sealed class GrantManagementAuth0Tests
     internal async Task Create_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model,
-                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                               .ConfigureAwait(true);
+            key = await this.grantManager.CreateAsync(model,
+                                new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                            .ConfigureAwait(true);
 
             // ASSERT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            (await manager.GetAllAsync(0, 100)
-                          .ConfigureAwait(true)).ResultSet.Should()
-                                                .ContainEquivalentOf(model,
-                                                    static options => options.Excluding(static grant => grant.Key));
+            (await this.grantManager.GetAllAsync(0, 100)
+                       .ConfigureAwait(true)).ResultSet.Should()
+                                             .ContainEquivalentOf(model,
+                                                 static options => options.Excluding(static grant => grant.Key));
         }
         finally
         {
             // Cleanup: Remove the client grant in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -385,54 +305,32 @@ public sealed class GrantManagementAuth0Tests
     internal async Task Update_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model,
-                                   new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                               .ConfigureAwait(true);
+            key = await this.grantManager.CreateAsync(model,
+                                new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                            .ConfigureAwait(true);
 
             // ACT.
             model.Scopes = new[] { "read:authentication_methods" };
 
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
+            await this.grantManager.UpdateAsync(key, model, new UpdateOperationMapper())
                       .ConfigureAwait(true);
 
-            await manager.UpdateAsync(key, model, new UpdateOperationMapper())
-                         .ConfigureAwait(true);
-
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            (await manager.GetAllAsync(0, 100)
-                          .ConfigureAwait(true)).ResultSet.Should()
-                                                .ContainEquivalentOf(model,
-                                                    static options => options.Excluding(static grant => grant.Key));
+            (await this.grantManager.GetAllAsync(0, 100)
+                       .ConfigureAwait(true)).ResultSet.Should()
+                                             .ContainEquivalentOf(model,
+                                                 static options => options.Excluding(static grant => grant.Key));
         }
         finally
         {
             // Cleanup: Remove the client grant in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.grantManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -443,19 +341,8 @@ public sealed class GrantManagementAuth0Tests
     [Theory(DisplayName = "Update raises an exception when the key is not found.")]
     internal async Task Update_UnknownKey_RaisesException(StringKey key, Model model)
     {
-        // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        Func<Task> act = () => manager.UpdateAsync(key, model, new UpdateOperationMapper());
+        Func<Task> act = () => this.grantManager.UpdateAsync(key, model, new UpdateOperationMapper());
 
         // ASSERT.
         await act.Should()
@@ -471,36 +358,18 @@ public sealed class GrantManagementAuth0Tests
     internal async Task Delete_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        GrantManager<Model, StringKey> manager
-            = new GrantManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        StringKey key = await manager.CreateAsync(model,
-                                         new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                                     .ConfigureAwait(true);
+        StringKey key = await this.grantManager.CreateAsync(model,
+                                      new CreateOperationMapper(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                                  .ConfigureAwait(true);
 
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
+        await this.grantManager.DeleteByKeyAsync(key)
                   .ConfigureAwait(true);
-
-        await manager.DeleteByKeyAsync(key)
-                     .ConfigureAwait(true);
 
         // ASSERT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        (await manager.GetAllAsync(0, 100)
-                      .ConfigureAwait(true)).ResultSet.Should()
-                                            .NotContainEquivalentOf(model);
+        (await this.grantManager.GetAllAsync(0, 100)
+                   .ConfigureAwait(true)).ResultSet.Should()
+                                         .NotContainEquivalentOf(model);
     }
 
     private static ApiConfiguration GetApiConfiguration()

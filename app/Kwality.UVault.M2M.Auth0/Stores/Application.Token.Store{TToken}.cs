@@ -24,13 +24,17 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Auth0.Stores;
 
+using global::Auth0.Core.Exceptions;
+
 using JetBrains.Annotations;
 
 using Kwality.UVault.Core.Auth0.API.Clients;
+using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Models;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.M2M.Auth0.Configuration;
 using Kwality.UVault.M2M.Auth0.Mapping.Abstractions;
+using Kwality.UVault.M2M.Auth0.Options;
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
@@ -38,12 +42,15 @@ using Kwality.UVault.M2M.Stores.Abstractions;
 internal sealed class ApplicationTokenStore<TToken>(
     ManagementClient managementClient,
     M2MConfiguration m2MConfiguration,
-    IModelTokenMapper<TToken> modelMapper) : IApplicationTokenStore<TToken>
+    IModelTokenMapper<TToken> modelMapper,
+    Auth0Options options) : IApplicationTokenStore<TToken>
     where TToken : TokenModel
 {
     public async Task<TToken> GetAccessTokenAsync(
         string clientId, string clientSecret, string audience, string grantType)
     {
+        options.RetryCount = 0;
+
         try
         {
             ArgumentNullException.ThrowIfNull(clientId);
@@ -63,11 +70,39 @@ internal sealed class ApplicationTokenStore<TToken>(
     private async Task<TToken> GetAccessTokenInternalAsync(
         string clientId, string clientSecret, string audience, string grantType)
     {
-        ApiManagementToken managementApiToken = await managementClient
-                                                      .GetM2MTokenAsync(m2MConfiguration.TokenEndpoint, grantType,
-                                                          clientId, clientSecret, audience)
-                                                      .ConfigureAwait(false);
+        try
+        {
+            ApiManagementToken managementApiToken = await managementClient
+                                                          .GetM2MTokenAsync(m2MConfiguration.TokenEndpoint, grantType,
+                                                              clientId, clientSecret, audience)
+                                                          .ConfigureAwait(false);
 
-        return modelMapper.Map(managementApiToken);
+            return modelMapper.Map(managementApiToken);
+        }
+        catch (RateLimitApiException ex)
+        {
+            switch (options.RateLimitBehaviour)
+            {
+                case RateLimitBehaviour.Fail:
+                    throw new ReadException("Failed to retrieve an access token.", ex);
+
+                case RateLimitBehaviour.Retry:
+                    if (options.RetryCount > options.RateLimitMaxRetryCount)
+                    {
+                        throw new ReadException("Failed to retrieve an access token.", ex);
+                    }
+
+                    options.RetryCount += 1;
+
+                    await Task.Delay(options.RateLimitRetryInterval)
+                              .ConfigureAwait(false);
+
+                    return await this.GetAccessTokenInternalAsync(clientId, clientSecret, audience, grantType)
+                                     .ConfigureAwait(false);
+
+                default:
+                    throw new ReadException("Failed to retrieve an access token.", ex);
+            }
+        }
     }
 }

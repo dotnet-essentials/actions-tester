@@ -28,6 +28,7 @@ using JetBrains.Annotations;
 
 using Kwality.UVault.APIs.Auth0.Mapping.Abstractions;
 using Kwality.UVault.APIs.Auth0.Models;
+using Kwality.UVault.APIs.Auth0.Options;
 using Kwality.UVault.APIs.Auth0.Stores;
 using Kwality.UVault.APIs.Options;
 using Kwality.UVault.Core.Auth0.API.Clients;
@@ -42,12 +43,14 @@ using Microsoft.Extensions.DependencyInjection;
 public static class ApiManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(
-        this ApiManagementOptions<TModel, StringKey> options, ApiConfiguration configuration)
+        this ApiManagementOptions<TModel, StringKey> options, ApiConfiguration configuration,
+        Func<Auth0Options>? auth0Options = null)
         where TModel : ApiModel
         where TMapper : class, IModelMapper<TModel>
     {
         ArgumentNullException.ThrowIfNull(options);
         options.UseStore<ApiStore<TModel>>();
+        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options?.Invoke() ?? new Auth0Options());
 
         // Register additional services.
         options.ServiceCollection.AddScoped<IModelMapper<TModel>, TMapper>();

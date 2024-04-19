@@ -35,6 +35,7 @@ using global::Auth0.ManagementApi.Models;
 
 using JetBrains.Annotations;
 
+using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Keys;
@@ -44,6 +45,7 @@ using Kwality.UVault.M2M.Auth0.Mapping.Abstractions;
 using Kwality.UVault.M2M.Auth0.Models;
 using Kwality.UVault.M2M.Auth0.Operations.Filters;
 using Kwality.UVault.M2M.Auth0.Operations.Mappers;
+using Kwality.UVault.M2M.Auth0.Options;
 using Kwality.UVault.M2M.Auth0.QA.Internal.Factories;
 using Kwality.UVault.M2M.Managers;
 using Kwality.UVault.M2M.Operations.Mappers.Abstractions;
@@ -52,12 +54,26 @@ using Kwality.UVault.QA.Common.Xunit.Traits;
 
 using Xunit;
 
-using static UVault.QA.Common.Properties.Delays;
-
 [Collection("Auth0")]
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class ApplicationManagementAuth0Tests
 {
+    private readonly ApplicationManager<Model, StringKey> applicationManager;
+
+    public ApplicationManagementAuth0Tests()
+    {
+        ApiConfiguration apiConfiguration = GetApiConfiguration();
+
+        this.applicationManager = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
+            options.UseAuth0Store<Model, ModelMapper>(apiConfiguration,
+                static () => new Auth0Options
+                {
+                    RateLimitBehaviour = RateLimitBehaviour.Retry,
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitMaxRetryCount = 5,
+                }));
+    }
+
     [AutoDomainData]
     [M2MManagement]
     [Auth0]
@@ -65,30 +81,17 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task GetAll_FirstPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                               .ConfigureAwait(true);
+            key = await this.applicationManager
+                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                            .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager.GetAllAsync(0, 5)
-                                                        .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this.applicationManager.GetAllAsync(0, 5)
+                                                     .ConfigureAwait(true);
 
             // ASSERT.
             result.HasNextPage.Should()
@@ -110,12 +113,8 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -127,30 +126,17 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task GetAll_SecondPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                               .ConfigureAwait(true);
+            key = await this.applicationManager
+                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                            .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager.GetAllAsync(1, 10)
-                                                        .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this.applicationManager.GetAllAsync(1, 10)
+                                                     .ConfigureAwait(true);
 
             // ASSERT.
             result.HasNextPage.Should()
@@ -165,12 +151,8 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -182,30 +164,17 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task GetAll_SecondPageWhenNotAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                               .ConfigureAwait(true);
+            key = await this.applicationManager
+                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                            .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager.GetAllAsync(3, 1)
-                                                        .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this.applicationManager.GetAllAsync(3, 1)
+                                                     .ConfigureAwait(true);
 
             // ASSERT.
             result.HasNextPage.Should()
@@ -226,12 +195,8 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the applications in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -243,37 +208,24 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task GetAll_WithFilter_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? keyOne = null;
         StringKey? keyTwo = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
+            keyOne = await this.applicationManager
+                               .CreateAsync(modelOne, new CreateOperationMapper(ClientApplicationType.Native))
+                               .ConfigureAwait(true);
 
-            keyOne = await manager.CreateAsync(modelOne, new CreateOperationMapper(ClientApplicationType.Native))
-                                  .ConfigureAwait(true);
-
-            keyTwo = await manager
-                           .CreateAsync(modelTwo, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                           .ConfigureAwait(true);
+            keyTwo = await this.applicationManager.CreateAsync(modelTwo,
+                                   new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                               .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            PagedResultSet<Model> result = await manager
-                                                 .GetAllAsync(0, 10,
-                                                     new OperationFilter(ClientApplicationType.NonInteractive))
-                                                 .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this.applicationManager
+                                                     .GetAllAsync(0, 10,
+                                                         new OperationFilter(ClientApplicationType.NonInteractive))
+                                                     .ConfigureAwait(true);
 
             // ASSERT.
             result.ResultSet.Count()
@@ -290,22 +242,14 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the applications in Auth0.
             if (keyOne != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(keyOne)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(keyOne)
-                             .ConfigureAwait(true);
             }
 
             if (keyTwo != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(keyTwo)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(keyTwo)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -316,19 +260,8 @@ public sealed class ApplicationManagementAuth0Tests
     [Theory(DisplayName = "Get by key raises an exception when the key is NOT found.")]
     internal async Task GetByKey_UnknownKey_RaisesException(StringKey key)
     {
-        // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.applicationManager.GetByKeyAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -343,47 +276,29 @@ public sealed class ApplicationManagementAuth0Tests
     [Theory(DisplayName = "Create succeeds.")]
     internal async Task Create_Succeeds(Model model)
     {
-        // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                               .ConfigureAwait(true);
+            key = await this.applicationManager
+                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                            .ConfigureAwait(true);
 
             // ASSERT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            (await manager.GetByKeyAsync(key)
-                          .ConfigureAwait(true)).Should()
-                                                .BeEquivalentTo(model,
-                                                    static options => options.Excluding(static application =>
-                                                        application.ClientSecret));
+            (await this.applicationManager.GetByKeyAsync(key)
+                       .ConfigureAwait(true)).Should()
+                                             .BeEquivalentTo(model,
+                                                 static options => options.Excluding(static application =>
+                                                     application.ClientSecret));
         }
         finally
         {
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -395,54 +310,33 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task Update_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                               .ConfigureAwait(true);
+            key = await this.applicationManager
+                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                            .ConfigureAwait(true);
 
             // ACT.
             model.Name = "UVault (Sample application)";
 
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
+            await this.applicationManager.UpdateAsync(key, model, new UpdateOperationMapper())
                       .ConfigureAwait(true);
 
-            await manager.UpdateAsync(key, model, new UpdateOperationMapper())
-                         .ConfigureAwait(true);
-
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            (await manager.GetByKeyAsync(key)
-                          .ConfigureAwait(true)).Should()
-                                                .BeEquivalentTo(model, static options => options
-                                                    .Excluding(static application => application.ClientSecret)
-                                                    .Excluding(static application => application.Key));
+            (await this.applicationManager.GetByKeyAsync(key)
+                       .ConfigureAwait(true)).Should()
+                                             .BeEquivalentTo(model, static options => options
+                                                 .Excluding(static application => application.ClientSecret)
+                                                 .Excluding(static application => application.Key));
         }
         finally
         {
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -453,19 +347,8 @@ public sealed class ApplicationManagementAuth0Tests
     [Theory(DisplayName = "Update raises an exception when the key is not found.")]
     internal async Task Update_UnknownKey_RaisesException(StringKey key, Model model)
     {
-        // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        Func<Task> act = () => manager.UpdateAsync(key, model, new UpdateOperationMapper());
+        Func<Task> act = () => this.applicationManager.UpdateAsync(key, model, new UpdateOperationMapper());
 
         // ASSERT.
         await act.Should()
@@ -481,34 +364,16 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task Delete_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        StringKey key = await manager
-                              .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                              .ConfigureAwait(true);
+        StringKey key = await this.applicationManager
+                                  .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                                  .ConfigureAwait(true);
 
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
+        await this.applicationManager.DeleteByKeyAsync(key)
                   .ConfigureAwait(true);
-
-        await manager.DeleteByKeyAsync(key)
-                     .ConfigureAwait(true);
 
         // ASSERT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.applicationManager.GetByKeyAsync(key);
 
         await act.Should()
                  .ThrowAsync<ReadException>()
@@ -522,19 +387,8 @@ public sealed class ApplicationManagementAuth0Tests
     [Theory(DisplayName = "Rotate client secret raises an exception when the key is NOT found.")]
     internal async Task RotateClientSecret_UnknownKey_RaisesException(StringKey key)
     {
-        // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        Func<Task<Model>> act = () => manager.RotateClientSecretAsync(key);
+        Func<Task<Model>> act = () => this.applicationManager.RotateClientSecretAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -550,45 +404,24 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task RotateClientSecret_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        ApplicationManager<Model, StringKey> manager
-            = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
+            key = await this.applicationManager
+                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                            .ConfigureAwait(true);
 
-            key = await manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                               .ConfigureAwait(true);
-
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            Model initialApplication = await manager.GetByKeyAsync(key)
-                                                    .ConfigureAwait(true);
+            Model initialApplication = await this.applicationManager.GetByKeyAsync(key)
+                                                 .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
+            await this.applicationManager.RotateClientSecretAsync(key)
                       .ConfigureAwait(true);
-
-            await manager.RotateClientSecretAsync(key)
-                         .ConfigureAwait(true);
 
             // ASSERT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            Model application = await manager.GetByKeyAsync(key)
-                                             .ConfigureAwait(true);
+            Model application = await this.applicationManager.GetByKeyAsync(key)
+                                          .ConfigureAwait(true);
 
             initialApplication.ClientSecret.Should()
                               .NotMatch(application.ClientSecret);
@@ -598,12 +431,8 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.applicationManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }

@@ -35,6 +35,7 @@ using global::Auth0.ManagementApi.Models;
 
 using JetBrains.Annotations;
 
+using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Keys;
@@ -44,6 +45,7 @@ using Kwality.UVault.Users.Auth0.Extensions;
 using Kwality.UVault.Users.Auth0.Mapping.Abstractions;
 using Kwality.UVault.Users.Auth0.Models;
 using Kwality.UVault.Users.Auth0.Operations.Mappers;
+using Kwality.UVault.Users.Auth0.Options;
 using Kwality.UVault.Users.Auth0.QA.Internal.Factories;
 using Kwality.UVault.Users.Auth0.QA.Internal.Models;
 using Kwality.UVault.Users.Managers;
@@ -53,30 +55,33 @@ using Xunit;
 
 using AuthenticationFailureException = Kwality.UVault.Users.Auth0.QA.Internal.Exceptions.AuthenticationFailureException;
 
-using static UVault.QA.Common.Properties.Delays;
-
 [Collection("Auth0")]
 public sealed class UserManagementAuth0Tests
 {
+    private readonly UserManager<Model, StringKey> userManager;
+
+    public UserManagementAuth0Tests()
+    {
+        ApiConfiguration apiConfiguration = GetApiConfiguration();
+
+        this.userManager = new UserManagerFactory().Create<Model, StringKey>(options =>
+            options.UseAuth0Store<Model, ModelMapper>(apiConfiguration,
+                static () => new Auth0Options
+                {
+                    RateLimitBehaviour = RateLimitBehaviour.Retry,
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitMaxRetryCount = 5,
+                }));
+    }
+
     [AutoDomainData]
     [UserManagement]
     [Auth0]
     [Theory(DisplayName = "Get by key raises an exception when the key is NOT found.")]
     internal async Task GetByKey_UnknownKey_RaisesException(StringKey key)
     {
-        // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.userManager.GetByKeyAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -92,30 +97,16 @@ public sealed class UserManagementAuth0Tests
     internal async Task GetByEmail_UnknownEmail_ReturnsEmptyCollection(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper())
-                               .ConfigureAwait(true);
+            key = await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                            .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            IEnumerable<Model> result = await manager.GetByEmailAsync("email@acme.com")
-                                                     .ConfigureAwait(true);
+            IEnumerable<Model> result = await this.userManager.GetByEmailAsync("email@acme.com")
+                                                  .ConfigureAwait(true);
 
             // ASSERT.
             result.Should()
@@ -126,8 +117,8 @@ public sealed class UserManagementAuth0Tests
             // Cleanup: Remove the user in Auth0.
             if (key != null)
             {
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
+                await this.userManager.DeleteByKeyAsync(key)
+                          .ConfigureAwait(true);
             }
         }
     }
@@ -139,36 +130,22 @@ public sealed class UserManagementAuth0Tests
     internal async Task GetByEmail_SingleMatch_ReturnsMatches(List<Model> models)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         var keys = new List<StringKey>();
 
         try
         {
             foreach (Model model in models)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
-                          .ConfigureAwait(true);
-
-                keys.Add(await manager.CreateAsync(model, new CreateOperationMapper())
-                                      .ConfigureAwait(true));
+                keys.Add(await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                                   .ConfigureAwait(true));
             }
 
             // ACT.
             Model expected = models.Skip(1)
                                    .First();
 
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            IEnumerable<Model> result = await manager.GetByEmailAsync(expected.Email)
-                                                     .ConfigureAwait(true);
+            IEnumerable<Model> result = await this.userManager.GetByEmailAsync(expected.Email)
+                                                  .ConfigureAwait(true);
 
             // ASSERT.
             result.Should()
@@ -180,12 +157,8 @@ public sealed class UserManagementAuth0Tests
             // Cleanup: Remove the user(s) in Auth0.
             foreach (StringKey key in keys)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.userManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -197,40 +170,22 @@ public sealed class UserManagementAuth0Tests
     internal async Task GetByEmail_MultipleMatches_ReturnsMatches(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> userManager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         var keys = new List<StringKey>();
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
+            keys.Add(await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                               .ConfigureAwait(true));
 
-            keys.Add(await userManager.CreateAsync(model, new CreateOperationMapper())
-                                      .ConfigureAwait(true));
+            keys.Add(await this.userManager.CreateAsync(model, new CreateOperationMapper("DEV-CNN-1"))
+                               .ConfigureAwait(true));
 
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            keys.Add(await userManager.CreateAsync(model, new CreateOperationMapper("DEV-CNN-1"))
-                                      .ConfigureAwait(true));
-
-            keys.Add(await userManager.CreateAsync(model, new CreateOperationMapper("DEV-CNN-2"))
-                                      .ConfigureAwait(true));
+            keys.Add(await this.userManager.CreateAsync(model, new CreateOperationMapper("DEV-CNN-2"))
+                               .ConfigureAwait(true));
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            IEnumerable<Model> result = await userManager.GetByEmailAsync(model.Email)
-                                                         .ConfigureAwait(true);
+            IEnumerable<Model> result = await this.userManager.GetByEmailAsync(model.Email)
+                                                  .ConfigureAwait(true);
 
             // ASSERT.
             result.Should()
@@ -242,12 +197,8 @@ public sealed class UserManagementAuth0Tests
             // Cleanup: Remove the user(s) in Auth0.
             foreach (StringKey key in keys)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.userManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await userManager.DeleteByKeyAsync(key)
-                                 .ConfigureAwait(true);
             }
         }
     }
@@ -259,45 +210,27 @@ public sealed class UserManagementAuth0Tests
     internal async Task Create_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper())
-                               .ConfigureAwait(true);
+            key = await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                            .ConfigureAwait(true);
 
             // ASSERT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            (await manager.GetByKeyAsync(key)
-                          .ConfigureAwait(true)).Should()
-                                                .BeEquivalentTo(model,
-                                                    static options => options.Excluding(static user => user.Password));
+            (await this.userManager.GetByKeyAsync(key)
+                       .ConfigureAwait(true)).Should()
+                                             .BeEquivalentTo(model,
+                                                 static options => options.Excluding(static user => user.Password));
         }
         finally
         {
             // Cleanup: Remove the user in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.userManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -309,23 +242,13 @@ public sealed class UserManagementAuth0Tests
     internal async Task Create_CreatedUser_CanAuthenticate(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> userManager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? userId = null;
 
         try
         {
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            userId = await userManager.CreateAsync(model, new CreateOperationMapper())
-                                      .ConfigureAwait(true);
+            userId = await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                               .ConfigureAwait(true);
 
             // ASSERT.
             (await AuthenticateUserAsync(model.Key.Value, model.Password ?? string.Empty)
@@ -337,12 +260,8 @@ public sealed class UserManagementAuth0Tests
             // Cleanup: Remove the user in Auth0.
             if (userId != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.userManager.DeleteByKeyAsync(userId)
                           .ConfigureAwait(true);
-
-                await userManager.DeleteByKeyAsync(userId)
-                                 .ConfigureAwait(true);
             }
         }
     }
@@ -354,29 +273,15 @@ public sealed class UserManagementAuth0Tests
     internal async Task Create_KeyExists_RaisesException(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper())
-                               .ConfigureAwait(true);
+            key = await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                            .ConfigureAwait(true);
 
             // ACT.
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            Func<Task<StringKey>> act = () => manager.CreateAsync(model, new CreateOperationMapper());
+            Func<Task<StringKey>> act = () => this.userManager.CreateAsync(model, new CreateOperationMapper());
 
             // ASSERT.
             await act.Should()
@@ -389,8 +294,8 @@ public sealed class UserManagementAuth0Tests
             // Cleanup: Remove the user in Auth0.
             if (key != null)
             {
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
+                await this.userManager.DeleteByKeyAsync(key)
+                          .ConfigureAwait(true);
             }
         }
     }
@@ -402,54 +307,32 @@ public sealed class UserManagementAuth0Tests
     internal async Task Update_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         StringKey? key = null;
 
         try
         {
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            key = await manager.CreateAsync(model, new CreateOperationMapper())
-                               .ConfigureAwait(true);
+            key = await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                            .ConfigureAwait(true);
 
             // ACT.
             model.FirstName = "Updated: FirstName.";
             model.Name = "Updated: Name.";
 
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
+            await this.userManager.UpdateAsync(key, model, new UpdateOperationMapper())
                       .ConfigureAwait(true);
 
-            await manager.UpdateAsync(key, model, new UpdateOperationMapper())
-                         .ConfigureAwait(true);
-
-            // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-            await Task.Delay(Auth0RateLimitDelay)
-                      .ConfigureAwait(true);
-
-            (await manager.GetByKeyAsync(key)
-                          .ConfigureAwait(true)).Should()
-                                                .BeEquivalentTo(model,
-                                                    static options => options.Excluding(static user => user.Password));
+            (await this.userManager.GetByKeyAsync(key)
+                       .ConfigureAwait(true)).Should()
+                                             .BeEquivalentTo(model,
+                                                 static options => options.Excluding(static user => user.Password));
         }
         finally
         {
             // Cleanup: Remove the user in Auth0.
             if (key != null)
             {
-                // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-                await Task.Delay(Auth0RateLimitDelay)
+                await this.userManager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
-
-                await manager.DeleteByKeyAsync(key)
-                             .ConfigureAwait(true);
             }
         }
     }
@@ -460,19 +343,8 @@ public sealed class UserManagementAuth0Tests
     [Theory(DisplayName = "Update raises an exception when the key is not found.")]
     internal async Task Update_UnknownKey_RaisesException(StringKey key, Model model)
     {
-        // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        Func<Task> act = () => manager.UpdateAsync(key, model, new UpdateOperationMapper());
+        Func<Task> act = () => this.userManager.UpdateAsync(key, model, new UpdateOperationMapper());
 
         // ASSERT.
         await act.Should()
@@ -488,29 +360,15 @@ public sealed class UserManagementAuth0Tests
     internal async Task Delete_Succeeds(Model model)
     {
         // ARRANGE.
-        ApiConfiguration apiConfiguration = GetApiConfiguration();
-
-        UserManager<Model, StringKey> manager
-            = new UserManagerFactory().Create<Model, StringKey>(options =>
-                options.UseAuth0Store<Model, ModelMapper>(apiConfiguration));
-
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
-                  .ConfigureAwait(true);
-
-        StringKey key = await manager.CreateAsync(model, new CreateOperationMapper())
-                                     .ConfigureAwait(true);
+        StringKey key = await this.userManager.CreateAsync(model, new CreateOperationMapper())
+                                  .ConfigureAwait(true);
 
         // ACT.
-        // To ensure that we don't Auth0's "Rate Limit", we wait for 2 seconds before executing this test.
-        await Task.Delay(Auth0RateLimitDelay)
+        await this.userManager.DeleteByKeyAsync(key)
                   .ConfigureAwait(true);
 
-        await manager.DeleteByKeyAsync(key)
-                     .ConfigureAwait(true);
-
         // ASSERT.
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.userManager.GetByKeyAsync(key);
 
         await act.Should()
                  .ThrowAsync<ReadException>()
