@@ -59,25 +59,7 @@ public sealed class ApplicationManagementOptions<TModel, TKey>
     public void UseStore<TStore>(ServiceLifetime serviceLifetime)
         where TStore : class, IApplicationStore<TModel, TKey>
     {
-        switch (serviceLifetime)
-        {
-            case ServiceLifetime.Singleton:
-                this.ServiceCollection.AddSingleton<IApplicationStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Scoped:
-                this.ServiceCollection.AddScoped<IApplicationStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Transient:
-                this.ServiceCollection.AddTransient<IApplicationStore<TModel, TKey>, TStore>();
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
-        }
+        this.ServiceCollection.Add(new ServiceDescriptor(typeof(IApplicationStore<TModel, TKey>), typeof(TStore),
+            serviceLifetime));
     }
 }

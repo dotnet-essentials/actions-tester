@@ -61,26 +61,8 @@ public static class UVaultOptionsExtensions
         ArgumentNullException.ThrowIfNull(options);
         options.Services.AddScoped<ApiManager<TModel, TKey>>();
 
-        switch (storeLifetime)
-        {
-            case ServiceLifetime.Singleton:
-                options.Services.AddSingleton<IApiStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-
-                break;
-
-            case ServiceLifetime.Scoped:
-                options.Services.AddScoped<IApiStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-
-                break;
-
-            case ServiceLifetime.Transient:
-                options.Services.AddTransient<IApiStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(storeLifetime), storeLifetime, null);
-        }
+        options.Services.Add(new ServiceDescriptor(typeof(IApiStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
 
         // Configure UVault's User Management component.
         action?.Invoke(new ApiManagementOptions<TModel, TKey>(options.Services));

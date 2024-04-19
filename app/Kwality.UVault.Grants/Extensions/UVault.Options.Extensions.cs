@@ -61,26 +61,8 @@ public static class UVaultOptionsExtensions
         ArgumentNullException.ThrowIfNull(options);
         options.Services.AddScoped<GrantManager<TModel, TKey>>();
 
-        switch (storeLifetime)
-        {
-            case ServiceLifetime.Singleton:
-                options.Services.AddSingleton<IGrantStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-
-                break;
-
-            case ServiceLifetime.Scoped:
-                options.Services.AddScoped<IGrantStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-
-                break;
-
-            case ServiceLifetime.Transient:
-                options.Services.AddTransient<IGrantStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(storeLifetime), storeLifetime, null);
-        }
+        options.Services.Add(new ServiceDescriptor(typeof(IGrantStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
 
         // Configure UVault's User Management component.
         action?.Invoke(new GrantManagementOptions<TModel, TKey>(options.Services));

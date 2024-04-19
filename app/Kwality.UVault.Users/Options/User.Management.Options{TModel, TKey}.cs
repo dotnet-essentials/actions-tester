@@ -59,25 +59,7 @@ public sealed class UserManagementOptions<TModel, TKey>
     public void UseStore<TStore>(ServiceLifetime serviceLifetime)
         where TStore : class, IUserStore<TModel, TKey>
     {
-        switch (serviceLifetime)
-        {
-            case ServiceLifetime.Singleton:
-                this.ServiceCollection.AddSingleton<IUserStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Scoped:
-                this.ServiceCollection.AddScoped<IUserStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Transient:
-                this.ServiceCollection.AddTransient<IUserStore<TModel, TKey>, TStore>();
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
-        }
+        this.ServiceCollection.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(TStore),
+            serviceLifetime));
     }
 }

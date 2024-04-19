@@ -51,25 +51,7 @@ public sealed class ApplicationTokenManagementOptions<TToken>
     public void UseStore<TStore>(ServiceLifetime serviceLifetime)
         where TStore : class, IApplicationTokenStore<TToken>
     {
-        switch (serviceLifetime)
-        {
-            case ServiceLifetime.Singleton:
-                this.ServiceCollection.AddSingleton<IApplicationTokenStore<TToken>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Scoped:
-                this.ServiceCollection.AddScoped<IApplicationTokenStore<TToken>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Transient:
-                this.ServiceCollection.AddTransient<IApplicationTokenStore<TToken>, TStore>();
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
-        }
+        this.ServiceCollection.Add(new ServiceDescriptor(typeof(IApplicationTokenStore<TToken>), typeof(TStore),
+            serviceLifetime));
     }
 }

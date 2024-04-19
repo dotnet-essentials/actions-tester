@@ -59,25 +59,7 @@ public sealed class ApiManagementOptions<TModel, TKey>
     public void UseStore<TStore>(ServiceLifetime serviceLifetime)
         where TStore : class, IApiStore<TModel, TKey>
     {
-        switch (serviceLifetime)
-        {
-            case ServiceLifetime.Singleton:
-                this.ServiceCollection.AddSingleton<IApiStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Scoped:
-                this.ServiceCollection.AddScoped<IApiStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Transient:
-                this.ServiceCollection.AddTransient<IApiStore<TModel, TKey>, TStore>();
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
-        }
+        this.ServiceCollection.Add(new ServiceDescriptor(typeof(IApiStore<TModel, TKey>), typeof(TStore),
+            serviceLifetime));
     }
 }

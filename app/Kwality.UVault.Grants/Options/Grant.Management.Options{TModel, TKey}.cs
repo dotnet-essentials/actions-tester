@@ -59,25 +59,7 @@ public sealed class GrantManagementOptions<TModel, TKey>
     public void UseStore<TStore>(ServiceLifetime serviceLifetime)
         where TStore : class, IGrantStore<TModel, TKey>
     {
-        switch (serviceLifetime)
-        {
-            case ServiceLifetime.Singleton:
-                this.ServiceCollection.AddSingleton<IGrantStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Scoped:
-                this.ServiceCollection.AddScoped<IGrantStore<TModel, TKey>, TStore>();
-
-                break;
-
-            case ServiceLifetime.Transient:
-                this.ServiceCollection.AddTransient<IGrantStore<TModel, TKey>, TStore>();
-
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(serviceLifetime), serviceLifetime, null);
-        }
+        this.ServiceCollection.Add(new ServiceDescriptor(typeof(IGrantStore<TModel, TKey>), typeof(TStore),
+            serviceLifetime));
     }
 }
