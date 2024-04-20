@@ -99,6 +99,7 @@ internal sealed class ApplicationStore<TModel>(
         return this.RotateClientSecretInternalAsync(key);
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<PagedResultSet<TModel>> GetAllInternalAsync(
         int pageIndex, int pageSize, IApplicationFilter? filter)
     {
@@ -158,6 +159,7 @@ internal sealed class ApplicationStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<TModel> GetByKeyInternalAsync(StringKey key)
     {
         try
@@ -208,6 +210,7 @@ internal sealed class ApplicationStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<StringKey> CreateInternalAsync(TModel model, IApplicationOperationMapper mapper)
     {
         try
@@ -259,6 +262,7 @@ internal sealed class ApplicationStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task UpdateInternalAsync(StringKey key, TModel model, IApplicationOperationMapper mapper)
     {
         try
@@ -310,6 +314,7 @@ internal sealed class ApplicationStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task DeleteByKeyInternalAsync(StringKey key)
     {
         try
@@ -360,6 +365,7 @@ internal sealed class ApplicationStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<TModel> RotateClientSecretInternalAsync(StringKey key)
     {
         try

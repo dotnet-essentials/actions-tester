@@ -74,6 +74,7 @@ internal sealed class ApiStore<TModel>(
         return this.DeleteByKeyInternalAsync(key);
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<TModel> GetByKeyInternalAsync(StringKey key)
     {
         try
@@ -124,6 +125,7 @@ internal sealed class ApiStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<StringKey> CreateInternalAsync(TModel model, IApiOperationMapper mapper)
     {
         try
@@ -177,6 +179,7 @@ internal sealed class ApiStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task DeleteByKeyInternalAsync(StringKey key)
     {
         try

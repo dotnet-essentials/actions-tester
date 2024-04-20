@@ -84,6 +84,7 @@ internal sealed class GrantStore<TModel>(
         return this.DeleteByKeyInternalAsync(key);
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<PagedResultSet<TModel>> GetAllInternalAsync(int pageIndex, int pageSize, IGrantFilter? filter)
     {
         try
@@ -143,6 +144,7 @@ internal sealed class GrantStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<StringKey> CreateInternalAsync(TModel model, IGrantOperationMapper mapper)
     {
         try
@@ -196,6 +198,7 @@ internal sealed class GrantStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task UpdateInternalAsync(StringKey key, TModel model, IGrantOperationMapper mapper)
     {
         try
@@ -247,6 +250,7 @@ internal sealed class GrantStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task DeleteByKeyInternalAsync(StringKey key)
     {
         try

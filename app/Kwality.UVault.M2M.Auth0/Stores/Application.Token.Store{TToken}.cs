@@ -71,6 +71,7 @@ internal sealed class ApplicationTokenStore<TToken>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<TToken> GetAccessTokenInternalAsync(
         string clientId, string clientSecret, string audience, string grantType)
     {

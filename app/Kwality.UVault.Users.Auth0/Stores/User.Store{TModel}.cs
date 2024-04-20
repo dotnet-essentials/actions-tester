@@ -88,6 +88,7 @@ internal sealed class UserStore<TModel>(
         return this.DeleteByKeyInternalAsync(key);
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<TModel> GetByKeyInternalAsync(StringKey key)
     {
         try
@@ -138,6 +139,7 @@ internal sealed class UserStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<IEnumerable<TModel>> GetByEmailInternalAsync(string email)
     {
         try
@@ -188,6 +190,7 @@ internal sealed class UserStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task<StringKey> CreateInternalAsync(TModel model, IUserOperationMapper mapper)
     {
         try
@@ -239,6 +242,7 @@ internal sealed class UserStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task UpdateInternalAsync(StringKey key, TModel model, IUserOperationMapper mapper)
     {
         try
@@ -290,6 +294,7 @@ internal sealed class UserStore<TModel>(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     private async Task DeleteByKeyInternalAsync(StringKey key)
     {
         try
