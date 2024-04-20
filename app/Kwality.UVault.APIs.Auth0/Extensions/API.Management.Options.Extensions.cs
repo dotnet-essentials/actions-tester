@@ -52,13 +52,13 @@ public static class ApiManagementOptionsExtensions
 
     public static void UseAuth0Store<TModel, TMapper>(
         this ApiManagementOptions<TModel, StringKey> options, ApiConfiguration configuration,
-        Func<Auth0Options>? auth0Options)
+        Func<Auth0Options> auth0Options)
         where TModel : ApiModel
         where TMapper : class, IModelMapper<TModel>
     {
         ArgumentNullException.ThrowIfNull(options);
         options.UseStore<ApiStore<TModel>>();
-        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options?.Invoke() ?? new Auth0Options());
+        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options.Invoke());
 
         // Register additional services.
         options.ServiceCollection.AddScoped<IModelMapper<TModel>, TMapper>();

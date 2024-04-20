@@ -43,14 +43,22 @@ using Microsoft.Extensions.DependencyInjection;
 public static class UserManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(
+        this UserManagementOptions<TModel, StringKey> options, ApiConfiguration configuration)
+        where TModel : UserModel
+        where TMapper : class, IModelMapper<TModel>
+    {
+        options.UseAuth0Store<TModel, TMapper>(configuration, static () => new Auth0Options());
+    }
+
+    public static void UseAuth0Store<TModel, TMapper>(
         this UserManagementOptions<TModel, StringKey> options, ApiConfiguration configuration,
-        Func<Auth0Options>? auth0Options = null)
+        Func<Auth0Options> auth0Options)
         where TModel : UserModel
         where TMapper : class, IModelMapper<TModel>
     {
         ArgumentNullException.ThrowIfNull(options);
         options.UseStore<UserStore<TModel>>();
-        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options?.Invoke() ?? new Auth0Options());
+        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options.Invoke());
 
         // Register additional services.
         options.ServiceCollection.AddScoped<IModelMapper<TModel>, TMapper>();

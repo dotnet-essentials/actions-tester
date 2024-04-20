@@ -44,14 +44,22 @@ using Microsoft.Extensions.DependencyInjection;
 public static class GrantManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(
+        this GrantManagementOptions<TModel, StringKey> options, ApiConfiguration configuration)
+        where TModel : GrantModel
+        where TMapper : class, IModelMapper<TModel>
+    {
+        options.UseAuth0Store<TModel, TMapper>(configuration, static () => new Auth0Options());
+    }
+
+    public static void UseAuth0Store<TModel, TMapper>(
         this GrantManagementOptions<TModel, StringKey> options, ApiConfiguration configuration,
-        Func<Auth0Options>? auth0Options = null)
+        Func<Auth0Options> auth0Options)
         where TModel : GrantModel
         where TMapper : class, IModelMapper<TModel>
     {
         ArgumentNullException.ThrowIfNull(options);
         options.ServiceCollection.AddScoped<IGrantStore<TModel, StringKey>, GrantStore<TModel>>();
-        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options?.Invoke() ?? new Auth0Options());
+        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options.Invoke());
 
         // Register additional services.
         options.ServiceCollection.AddScoped<IModelMapper<TModel>, TMapper>();

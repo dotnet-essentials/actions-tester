@@ -42,14 +42,22 @@ using Microsoft.Extensions.DependencyInjection;
 public static class ApplicationTokenManagementOptionsExtensions
 {
     public static void UseAuth0Store<TToken, TMapper>(
+        this ApplicationTokenManagementOptions<TToken> options, M2MConfiguration configuration)
+        where TToken : TokenModel
+        where TMapper : class, IModelTokenMapper<TToken>
+    {
+        options.UseAuth0Store<TToken, TMapper>(configuration, static () => new Auth0Options());
+    }
+
+    public static void UseAuth0Store<TToken, TMapper>(
         this ApplicationTokenManagementOptions<TToken> options, M2MConfiguration configuration,
-        Func<Auth0Options>? auth0Options = null)
+        Func<Auth0Options> auth0Options)
         where TToken : TokenModel
         where TMapper : class, IModelTokenMapper<TToken>
     {
         ArgumentNullException.ThrowIfNull(options);
         options.UseStore<ApplicationTokenStore<TToken>>();
-        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options?.Invoke() ?? new Auth0Options());
+        options.ServiceCollection.AddScoped<Auth0Options>(_ => auth0Options.Invoke());
 
         // Register additional services.
         options.ServiceCollection.AddScoped<IModelTokenMapper<TToken>, TMapper>();
