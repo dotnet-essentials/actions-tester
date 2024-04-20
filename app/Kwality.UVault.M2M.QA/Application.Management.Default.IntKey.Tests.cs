@@ -45,6 +45,7 @@ using Xunit;
 
 public sealed class ApplicationManagementDefaultIntKeyTests
 {
+    private const int pageSize = 100;
     private readonly ApplicationManager<Model, IntKey>
         manager = new ApplicationManagerFactory().Create<Model, IntKey>();
 
@@ -234,7 +235,7 @@ public sealed class ApplicationManagementDefaultIntKeyTests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Count()
                                          .Should()
                                          .Be(1);

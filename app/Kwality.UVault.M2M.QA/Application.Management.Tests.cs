@@ -476,32 +476,32 @@ public sealed class ApplicationManagementTests
     {
         public Task<PagedResultSet<TModel>> GetAllAsync(int pageIndex, int pageSize, IApplicationFilter? filter)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task<TModel> GetByKeyAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task<TKey> CreateAsync(TModel model, IApplicationOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task UpdateAsync(TKey key, TModel model, IApplicationOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task DeleteByKeyAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task<TModel> RotateClientSecretAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 

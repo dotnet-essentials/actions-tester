@@ -43,8 +43,16 @@ using Microsoft.Extensions.DependencyInjection;
 public static class ApiManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(
+        this ApiManagementOptions<TModel, StringKey> options, ApiConfiguration configuration)
+        where TModel : ApiModel
+        where TMapper : class, IModelMapper<TModel>
+    {
+        options.UseAuth0Store<TModel, TMapper>(configuration, static () => new Auth0Options());
+    }
+
+    public static void UseAuth0Store<TModel, TMapper>(
         this ApiManagementOptions<TModel, StringKey> options, ApiConfiguration configuration,
-        Func<Auth0Options>? auth0Options = null)
+        Func<Auth0Options>? auth0Options)
         where TModel : ApiModel
         where TMapper : class, IModelMapper<TModel>
     {

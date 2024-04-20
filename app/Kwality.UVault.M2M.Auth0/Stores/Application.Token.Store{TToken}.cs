@@ -48,6 +48,8 @@ internal sealed class ApplicationTokenStore<TToken>(
     Auth0Options options) : IApplicationTokenStore<TToken>
     where TToken : TokenModel
 {
+    private const string readError = "Failed to retrieve access token.";
+
     public async Task<TToken> GetAccessTokenAsync(
         string clientId, string clientSecret, string audience, string grantType)
     {
@@ -65,7 +67,7 @@ internal sealed class ApplicationTokenStore<TToken>(
         }
         catch (Exception ex)
         {
-            throw new ReadException("Failed to retrieve an access token.", ex);
+            throw new ReadException(readError, ex);
         }
     }
 
@@ -97,12 +99,12 @@ internal sealed class ApplicationTokenStore<TToken>(
         switch (options.RateLimitBehaviour)
         {
             case RateLimitBehaviour.Fail:
-                throw new ReadException("Failed to retrieve an access token.", ex);
+                throw new ReadException(readError, ex);
 
             case RateLimitBehaviour.Retry:
                 if (options.RetryCount > options.RateLimitMaxRetryCount)
                 {
-                    throw new ReadException("Failed to retrieve an access token.", ex);
+                    throw new ReadException(readError, ex);
                 }
 
                 options.RetryCount += 1;
@@ -114,7 +116,7 @@ internal sealed class ApplicationTokenStore<TToken>(
                                  .ConfigureAwait(false);
 
             default:
-                throw new ReadException("Failed to retrieve an access token.", ex);
+                throw new ReadException(readError, ex);
         }
     }
 }

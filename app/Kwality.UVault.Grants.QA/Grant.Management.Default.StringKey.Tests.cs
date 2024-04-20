@@ -48,6 +48,7 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class GrantManagementDefaultStringKeyTests
 {
+    private const int pageSize = 100;
     private readonly GrantManager<Model, StringKey> manager = new GrantManagerFactory().Create<Model, StringKey>();
 
     [AutoData]
@@ -194,7 +195,7 @@ public sealed class GrantManagementDefaultStringKeyTests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .ContainEquivalentOf(model);
     }
@@ -215,12 +216,12 @@ public sealed class GrantManagementDefaultStringKeyTests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Count()
                                          .Should()
                                          .Be(1);
 
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .ContainEquivalentOf(model);
     }
@@ -254,7 +255,7 @@ public sealed class GrantManagementDefaultStringKeyTests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .BeEmpty();
     }

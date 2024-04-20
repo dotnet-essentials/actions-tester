@@ -51,6 +51,8 @@ internal sealed class ApiStore<TModel>(
     Auth0Options options) : IApiStore<TModel, StringKey>
     where TModel : ApiModel
 {
+    private const string createError = "Failed to create API.";
+
     public Task<TModel> GetByKeyAsync(StringKey key)
     {
         options.RetryCount = 0;
@@ -143,7 +145,7 @@ internal sealed class ApiStore<TModel>(
         }
         catch (Exception ex)
         {
-            throw new CreateException("Failed to create API.", ex);
+            throw new CreateException(createError, ex);
         }
     }
 
@@ -154,12 +156,12 @@ internal sealed class ApiStore<TModel>(
         switch (options.RateLimitBehaviour)
         {
             case RateLimitBehaviour.Fail:
-                throw new ReadException("Failed to create API.", ex);
+                throw new ReadException(createError, ex);
 
             case RateLimitBehaviour.Retry:
                 if (options.RetryCount > options.RateLimitMaxRetryCount)
                 {
-                    throw new ReadException("Failed to create API.", ex);
+                    throw new ReadException(createError, ex);
                 }
 
                 options.RetryCount += 1;
@@ -171,7 +173,7 @@ internal sealed class ApiStore<TModel>(
                                  .ConfigureAwait(false);
 
             default:
-                throw new ReadException("Failed to create API.", ex);
+                throw new ReadException(createError, ex);
         }
     }
 

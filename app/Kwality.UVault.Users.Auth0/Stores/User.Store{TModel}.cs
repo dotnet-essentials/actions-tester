@@ -51,6 +51,8 @@ internal sealed class UserStore<TModel>(
     Auth0Options options) : IUserStore<TModel, StringKey>
     where TModel : UserModel
 {
+    private const string createError = "Failed to create user.";
+
     public Task<TModel> GetByKeyAsync(StringKey key)
     {
         options.RetryCount = 0;
@@ -205,7 +207,7 @@ internal sealed class UserStore<TModel>(
         }
         catch (Exception ex)
         {
-            throw new CreateException("Failed to create user.", ex);
+            throw new CreateException(createError, ex);
         }
     }
 
@@ -216,12 +218,12 @@ internal sealed class UserStore<TModel>(
         switch (options.RateLimitBehaviour)
         {
             case RateLimitBehaviour.Fail:
-                throw new ReadException("Failed to create user.", ex);
+                throw new ReadException(createError, ex);
 
             case RateLimitBehaviour.Retry:
                 if (options.RetryCount > options.RateLimitMaxRetryCount)
                 {
-                    throw new ReadException("Failed to create user.", ex);
+                    throw new ReadException(createError, ex);
                 }
 
                 options.RetryCount += 1;
@@ -233,7 +235,7 @@ internal sealed class UserStore<TModel>(
                                  .ConfigureAwait(false);
 
             default:
-                throw new ReadException("Failed to create user.", ex);
+                throw new ReadException(createError, ex);
         }
     }
 

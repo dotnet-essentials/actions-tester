@@ -59,6 +59,7 @@ using Xunit;
 public sealed class ApplicationManagementAuth0Tests
 {
     private const int rateLimitMaxRetryCount = 5;
+    private const int rateLimitDelaySeconds = 2;
     private readonly ApplicationManager<Model, StringKey> manager;
 
     public ApplicationManagementAuth0Tests()
@@ -70,7 +71,7 @@ public sealed class ApplicationManagementAuth0Tests
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
-                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(rateLimitDelaySeconds),
                     RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }

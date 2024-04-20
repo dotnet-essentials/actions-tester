@@ -55,6 +55,7 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class GrantManagementTests
 {
+    private const int pageSize = 100;
     private readonly GrantManager<Model, IntKey> manager
         = new GrantManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
 
@@ -319,7 +320,7 @@ public sealed class GrantManagementTests
               .Should()
               .Be(1);
 
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .ContainEquivalentOf(modelTwo);
     }
@@ -334,7 +335,7 @@ public sealed class GrantManagementTests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .ContainEquivalentOf(model);
     }
@@ -355,7 +356,7 @@ public sealed class GrantManagementTests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .ContainEquivalentOf(model);
     }
@@ -389,7 +390,7 @@ public sealed class GrantManagementTests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.manager.GetAllAsync(0, 100)
+        (await this.manager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .BeEmpty();
     }
@@ -416,22 +417,22 @@ public sealed class GrantManagementTests
     {
         public Task<PagedResultSet<TModel>> GetAllAsync(int pageIndex, int pageSize, IGrantFilter? filter)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task<TKey> CreateAsync(TModel model, IGrantOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task UpdateAsync(TKey key, TModel model, IGrantOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task DeleteByKeyAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 

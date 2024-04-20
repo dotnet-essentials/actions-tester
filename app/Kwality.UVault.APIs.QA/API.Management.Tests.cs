@@ -272,17 +272,17 @@ public sealed class ApiManagementTests
     {
         public Task<TModel> GetByKeyAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task<TKey> CreateAsync(TModel model, IApiOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task DeleteByKeyAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 

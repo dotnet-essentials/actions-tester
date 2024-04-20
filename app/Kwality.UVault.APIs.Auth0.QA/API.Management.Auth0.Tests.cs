@@ -57,6 +57,7 @@ using Xunit;
 public sealed class ApiManagementAuth0Tests
 {
     private const int rateLimitMaxRetryCount = 5;
+    private const int rateLimitDelaySeconds = 2;
     private readonly ApiManager<Model, StringKey> apiManager;
 
     public ApiManagementAuth0Tests()
@@ -68,7 +69,7 @@ public sealed class ApiManagementAuth0Tests
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
-                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(rateLimitDelaySeconds),
                     RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }

@@ -270,27 +270,27 @@ public sealed class UserManagementDataTests
     {
         public Task<TModel> GetByKeyAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task<IEnumerable<TModel>> GetByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task<TKey> CreateAsync(TModel model, IUserOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task UpdateAsync(TKey key, TModel model, IUserOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public Task DeleteByKeyAsync(TKey key)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 
@@ -302,7 +302,7 @@ public sealed class UserManagementDataTests
     {
         public Task CreateAsync(TKey key, TData data, IUserDataOperationMapper mapper)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 

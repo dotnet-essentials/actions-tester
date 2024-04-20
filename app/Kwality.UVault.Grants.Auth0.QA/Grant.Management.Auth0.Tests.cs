@@ -58,6 +58,8 @@ using Xunit;
 public sealed class GrantManagementAuth0Tests
 {
     private const int rateLimitMaxRetryCount = 5;
+    private const int rateLimitDelaySeconds = 2;
+    private const int pageSize = 100;
     private readonly GrantManager<Model, StringKey> grantManager;
 
     public GrantManagementAuth0Tests()
@@ -69,7 +71,7 @@ public sealed class GrantManagementAuth0Tests
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
-                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(rateLimitDelaySeconds),
                     RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }
@@ -283,7 +285,7 @@ public sealed class GrantManagementAuth0Tests
                             .ConfigureAwait(true);
 
             // ASSERT.
-            (await this.grantManager.GetAllAsync(0, 100)
+            (await this.grantManager.GetAllAsync(0, pageSize)
                        .ConfigureAwait(true)).ResultSet.Should()
                                              .ContainEquivalentOf(model,
                                                  static options => options.Excluding(static grant => grant.Key));
@@ -320,7 +322,7 @@ public sealed class GrantManagementAuth0Tests
             await this.grantManager.UpdateAsync(key, model, new UpdateOperationMapper())
                       .ConfigureAwait(true);
 
-            (await this.grantManager.GetAllAsync(0, 100)
+            (await this.grantManager.GetAllAsync(0, pageSize)
                        .ConfigureAwait(true)).ResultSet.Should()
                                              .ContainEquivalentOf(model,
                                                  static options => options.Excluding(static grant => grant.Key));
@@ -368,7 +370,7 @@ public sealed class GrantManagementAuth0Tests
                   .ConfigureAwait(true);
 
         // ASSERT.
-        (await this.grantManager.GetAllAsync(0, 100)
+        (await this.grantManager.GetAllAsync(0, pageSize)
                    .ConfigureAwait(true)).ResultSet.Should()
                                          .NotContainEquivalentOf(model);
     }

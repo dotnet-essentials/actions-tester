@@ -53,6 +53,7 @@ using Xunit;
 public sealed class ApplicationTokenManagementAuth0Tests
 {
     private const int rateLimitMaxRetryCount = 5;
+    private const int rateLimitDelaySeconds = 2;
     private readonly ApplicationManager<Model, StringKey> manager;
     private readonly ApplicationTokenManager<TokenModel> tokenManager;
 
@@ -66,7 +67,7 @@ public sealed class ApplicationTokenManagementAuth0Tests
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
-                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(rateLimitDelaySeconds),
                     RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
 
@@ -75,7 +76,7 @@ public sealed class ApplicationTokenManagementAuth0Tests
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
-                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(rateLimitDelaySeconds),
                     RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }

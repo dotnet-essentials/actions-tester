@@ -54,6 +54,9 @@ internal sealed class ApplicationStore<TModel>(
     Auth0Options options) : IApplicationStore<TModel, StringKey>
     where TModel : ApplicationModel
 {
+    private const string readError = "Failed to read applications.";
+    private const string createError = "Failed to create application.";
+    
     public Task<PagedResultSet<TModel>> GetAllAsync(int pageIndex, int pageSize, IApplicationFilter? filter)
     {
         options.RetryCount = 0;
@@ -123,7 +126,7 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (Exception ex)
         {
-            throw new ReadException("Failed to read applications.", ex);
+            throw new ReadException(readError, ex);
         }
     }
 
@@ -134,12 +137,12 @@ internal sealed class ApplicationStore<TModel>(
         switch (options.RateLimitBehaviour)
         {
             case RateLimitBehaviour.Fail:
-                throw new ReadException("Failed to read applications.", ex);
+                throw new ReadException(readError, ex);
 
             case RateLimitBehaviour.Retry:
                 if (options.RetryCount > options.RateLimitMaxRetryCount)
                 {
-                    throw new ReadException("Failed to read applications.", ex);
+                    throw new ReadException(readError, ex);
                 }
 
                 options.RetryCount += 1;
@@ -151,7 +154,7 @@ internal sealed class ApplicationStore<TModel>(
                                  .ConfigureAwait(false);
 
             default:
-                throw new ReadException("Failed to read applications.", ex);
+                throw new ReadException(readError, ex);
         }
     }
 
@@ -224,7 +227,7 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (Exception ex)
         {
-            throw new CreateException("Failed to create application.", ex);
+            throw new CreateException(createError, ex);
         }
     }
 
@@ -235,12 +238,12 @@ internal sealed class ApplicationStore<TModel>(
         switch (options.RateLimitBehaviour)
         {
             case RateLimitBehaviour.Fail:
-                throw new ReadException("Failed to create application.", ex);
+                throw new ReadException(createError, ex);
 
             case RateLimitBehaviour.Retry:
                 if (options.RetryCount > options.RateLimitMaxRetryCount)
                 {
-                    throw new ReadException("Failed to create application.", ex);
+                    throw new ReadException(createError, ex);
                 }
 
                 options.RetryCount += 1;
@@ -252,7 +255,7 @@ internal sealed class ApplicationStore<TModel>(
                                  .ConfigureAwait(false);
 
             default:
-                throw new ReadException("Failed to create application.", ex);
+                throw new ReadException(createError, ex);
         }
     }
 
