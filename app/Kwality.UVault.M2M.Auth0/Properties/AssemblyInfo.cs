@@ -22,9 +22,7 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: CLSCompliant(false)]
 [assembly: ComVisible(false)]
-[assembly: InternalsVisibleTo("Kwality.UVault.M2M.Auth0.QA")]

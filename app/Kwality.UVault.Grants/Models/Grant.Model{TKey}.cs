@@ -24,9 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Grants.Models;
 
-using JetBrains.Annotations;
-
-[PublicAPI]
 public class GrantModel<TKey>(TKey key)
     where TKey : IEquatable<TKey>
 {

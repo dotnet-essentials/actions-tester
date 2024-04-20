@@ -24,9 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Models;
 
-using JetBrains.Annotations;
-
-[PublicAPI]
 public class UserModel<TKey>(TKey key, string email)
     where TKey : IEquatable<TKey>
 {

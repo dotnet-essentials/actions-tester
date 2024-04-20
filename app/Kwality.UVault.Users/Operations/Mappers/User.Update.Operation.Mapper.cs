@@ -24,13 +24,10 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Operations.Mappers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.Users.Operations.Mappers.Abstractions;
 
-[PublicAPI]
 public sealed class UserUpdateOperationMapper : IUserOperationMapper
 {
     public TDestination Create<TSource, TDestination>(TSource source)

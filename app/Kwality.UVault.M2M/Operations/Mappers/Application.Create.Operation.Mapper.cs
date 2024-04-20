@@ -24,13 +24,10 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Operations.Mappers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.M2M.Operations.Mappers.Abstractions;
 
-[PublicAPI]
 public sealed class CreateOperationMapper : IApplicationOperationMapper
 {
     public TDestination Create<TSource, TDestination>(TSource source)

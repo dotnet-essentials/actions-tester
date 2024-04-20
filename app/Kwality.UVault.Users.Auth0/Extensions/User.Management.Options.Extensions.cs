@@ -24,8 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Auth0.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Auth0.API.Clients;
 using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Keys;
@@ -39,7 +37,6 @@ using Kwality.UVault.Users.Options;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class UserManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(

@@ -24,15 +24,12 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Options;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Users.Managers;
 using Kwality.UVault.Users.Models;
 using Kwality.UVault.Users.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public sealed class UserManagementOptions<TModel, TKey>
     where TModel : UserModel<TKey>
     where TKey : IEquatable<TKey>

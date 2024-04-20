@@ -26,11 +26,8 @@ namespace Kwality.UVault.Grants.Auth0.Models;
 
 using System.Diagnostics.CodeAnalysis;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.Grants.Models;
 
-[PublicAPI]
 [ExcludeFromCodeCoverage]
 public class GrantModel(StringKey key) : GrantModel<StringKey>(key);

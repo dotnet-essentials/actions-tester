@@ -24,8 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.APIs.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Internal.Stores;
 using Kwality.UVault.APIs.Managers;
 using Kwality.UVault.APIs.Models;
@@ -35,7 +33,6 @@ using Kwality.UVault.Core.Options;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class UVaultOptionsExtensions
 {
     public static void UseApiManagement<TModel, TKey>(this UVaultOptions options)

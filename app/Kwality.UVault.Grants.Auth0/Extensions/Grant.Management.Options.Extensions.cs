@@ -24,8 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Grants.Auth0.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Auth0.API.Clients;
 using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Keys;
@@ -40,7 +38,6 @@ using Kwality.UVault.Grants.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class GrantManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(

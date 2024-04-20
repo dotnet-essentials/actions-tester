@@ -24,15 +24,12 @@
 // =====================================================================================================================
 namespace Kwality.UVault.APIs.Options;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Managers;
 using Kwality.UVault.APIs.Models;
 using Kwality.UVault.APIs.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public sealed class ApiManagementOptions<TModel, TKey>
     where TModel : ApiModel<TKey>
     where TKey : IEquatable<TKey>

@@ -24,15 +24,12 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Grants.Options;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Grants.Managers;
 using Kwality.UVault.Grants.Models;
 using Kwality.UVault.Grants.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public sealed class GrantManagementOptions<TModel, TKey>
     where TModel : GrantModel<TKey>
     where TKey : IEquatable<TKey>

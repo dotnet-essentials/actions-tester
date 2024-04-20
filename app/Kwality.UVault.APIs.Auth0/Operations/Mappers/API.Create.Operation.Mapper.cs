@@ -26,13 +26,10 @@ namespace Kwality.UVault.APIs.Auth0.Operations.Mappers;
 
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Operations.Mappers.Abstractions;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 
-[PublicAPI]
 public abstract class Auth0ApiCreateOperationMapper : IApiOperationMapper
 {
     public TDestination Create<TSource, TDestination>(TSource source)

@@ -24,14 +24,11 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Options;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public sealed class ApplicationTokenManagementOptions<TToken>
     where TToken : TokenModel
 {

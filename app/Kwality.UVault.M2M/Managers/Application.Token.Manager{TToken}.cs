@@ -24,12 +24,9 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Managers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
-[PublicAPI]
 public sealed class ApplicationTokenManager<TToken>(IApplicationTokenStore<TToken> tokenStore)
     where TToken : TokenModel
 {

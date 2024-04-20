@@ -24,9 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Core.Auth0.Configuration;
 
-using JetBrains.Annotations;
-
-[PublicAPI]
 public sealed class ApiConfiguration(Uri tokenEndpoint, string clientId, string clientSecret, string audience)
 {
     public Uri TokenEndpoint { get; } = tokenEndpoint;

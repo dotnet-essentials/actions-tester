@@ -24,13 +24,10 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Core.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Options;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class ServiceCollectionExtensions
 {
     public static void AddUVault(this IServiceCollection services, Action<UVaultOptions> action)

@@ -24,11 +24,8 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Auth0.Options;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Auth0.Behaviour;
 
-[PublicAPI]
 public sealed class Auth0Options
 {
     public RateLimitBehaviour RateLimitBehaviour { get; init; } = RateLimitBehaviour.Fail;

@@ -24,15 +24,12 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Grants.Managers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Models;
 using Kwality.UVault.Grants.Models;
 using Kwality.UVault.Grants.Operations.Filters.Abstractions;
 using Kwality.UVault.Grants.Operations.Mappers.Abstractions;
 using Kwality.UVault.Grants.Stores.Abstractions;
 
-[PublicAPI]
 public class GrantManager<TModel, TKey>(IGrantStore<TModel, TKey> store)
     where TModel : GrantModel<TKey>
     where TKey : IEquatable<TKey>

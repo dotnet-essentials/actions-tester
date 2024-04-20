@@ -26,11 +26,8 @@ namespace Kwality.UVault.APIs.Auth0.Models;
 
 using System.Diagnostics.CodeAnalysis;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Models;
 using Kwality.UVault.Core.Keys;
 
-[PublicAPI]
 [ExcludeFromCodeCoverage]
 public class ApiModel(StringKey key) : ApiModel<StringKey>(key);

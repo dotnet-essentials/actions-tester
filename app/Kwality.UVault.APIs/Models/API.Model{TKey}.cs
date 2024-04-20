@@ -24,9 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.APIs.Models;
 
-using JetBrains.Annotations;
-
-[PublicAPI]
 public class ApiModel<TKey>(TKey key)
     where TKey : IEquatable<TKey>
 {

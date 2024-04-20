@@ -24,8 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Options;
 using Kwality.UVault.M2M.Internal.Stores;
 using Kwality.UVault.M2M.Managers;
@@ -35,7 +33,6 @@ using Kwality.UVault.M2M.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class UVaultOptionsExtensions
 {
     public static void UseApplicationManagement<TModel, TKey>(this UVaultOptions options)

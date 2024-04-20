@@ -24,9 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Core.Keys;
 
-using JetBrains.Annotations;
-
-[PublicAPI]
 public sealed class StringKey(string value) : IEquatable<StringKey>
 {
     public string Value { get; } = value;

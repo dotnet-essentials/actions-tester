@@ -24,13 +24,10 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Core.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Options;
 
 using Microsoft.AspNetCore.Builder;
 
-[PublicAPI]
 public static class ApplicationBuilderExtensions
 {
     public static void UseUVault(this IApplicationBuilder app, Action<UVaultMiddlewareOptions>? action)

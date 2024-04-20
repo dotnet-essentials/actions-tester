@@ -24,13 +24,10 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Managers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Users.Models;
 using Kwality.UVault.Users.Operations.Mappers.Abstractions;
 using Kwality.UVault.Users.Stores.Abstractions;
 
-[PublicAPI]
 public class UserManager<TModel, TKey, TData>(IUserStore<TModel, TKey> store, IUserDataStore<TData, TKey> dataStore)
     where TModel : UserModel<TKey>
     where TKey : IEquatable<TKey>

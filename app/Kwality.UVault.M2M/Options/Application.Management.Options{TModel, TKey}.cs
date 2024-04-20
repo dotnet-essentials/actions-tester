@@ -24,15 +24,12 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Options;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.M2M.Managers;
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public sealed class ApplicationManagementOptions<TModel, TKey>
     where TModel : ApplicationModel<TKey>
     where TKey : IEquatable<TKey>

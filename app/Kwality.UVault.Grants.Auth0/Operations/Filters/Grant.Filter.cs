@@ -26,13 +26,10 @@ namespace Kwality.UVault.Grants.Auth0.Operations.Filters;
 
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.Grants.Operations.Filters.Abstractions;
 
-[PublicAPI]
 public abstract class Auth0GrantFilter : IGrantFilter
 {
     public TDestination Create<TDestination>()

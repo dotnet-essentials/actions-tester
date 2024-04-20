@@ -26,13 +26,10 @@ namespace Kwality.UVault.Grants.Auth0.Operations.Mappers;
 
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.Grants.Operations.Mappers.Abstractions;
 
-[PublicAPI]
 public abstract class Auth0GrantUpdateOperationMapper : IGrantOperationMapper
 {
     public TDestination Create<TSource, TDestination>(TSource source)

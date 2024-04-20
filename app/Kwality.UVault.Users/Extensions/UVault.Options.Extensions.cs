@@ -24,8 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Options;
 using Kwality.UVault.Users.Internal.Stores;
 using Kwality.UVault.Users.Managers;
@@ -35,7 +33,6 @@ using Kwality.UVault.Users.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class UVaultOptionsExtensions
 {
     public static void UseUserManagement<TModel, TKey>(this UVaultOptions options)

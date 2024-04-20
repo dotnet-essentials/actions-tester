@@ -24,9 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Models;
 
-using JetBrains.Annotations;
-
-[PublicAPI]
 public class ApplicationModel<TKey>(TKey key)
     where TKey : IEquatable<TKey>
 {

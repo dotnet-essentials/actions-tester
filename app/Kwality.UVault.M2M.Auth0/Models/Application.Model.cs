@@ -26,11 +26,8 @@ namespace Kwality.UVault.M2M.Auth0.Models;
 
 using System.Diagnostics.CodeAnalysis;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.M2M.Models;
 
-[PublicAPI]
 [ExcludeFromCodeCoverage]
 public class ApplicationModel(StringKey key) : ApplicationModel<StringKey>(key);

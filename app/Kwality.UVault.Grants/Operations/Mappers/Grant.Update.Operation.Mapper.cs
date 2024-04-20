@@ -24,13 +24,10 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Grants.Operations.Mappers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.Grants.Operations.Mappers.Abstractions;
 
-[PublicAPI]
 public sealed class GrantUpdateOperationMapper : IGrantOperationMapper
 {
     public TDestination Create<TSource, TDestination>(TSource source)

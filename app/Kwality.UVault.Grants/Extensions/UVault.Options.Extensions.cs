@@ -24,8 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Grants.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Options;
 using Kwality.UVault.Grants.Internal.Stores;
 using Kwality.UVault.Grants.Managers;
@@ -35,7 +33,6 @@ using Kwality.UVault.Grants.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class UVaultOptionsExtensions
 {
     public static void UseGrantManagement<TModel, TKey>(this UVaultOptions options)

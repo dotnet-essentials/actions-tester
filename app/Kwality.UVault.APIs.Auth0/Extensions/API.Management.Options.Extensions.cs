@@ -24,8 +24,6 @@
 // =====================================================================================================================
 namespace Kwality.UVault.APIs.Auth0.Extensions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Auth0.Mapping.Abstractions;
 using Kwality.UVault.APIs.Auth0.Models;
 using Kwality.UVault.APIs.Auth0.Options;
@@ -39,7 +37,6 @@ using Kwality.UVault.Core.System.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class ApiManagementOptionsExtensions
 {
     public static void UseAuth0Store<TModel, TMapper>(

@@ -24,13 +24,10 @@
 // =====================================================================================================================
 namespace Kwality.UVault.APIs.Managers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Models;
 using Kwality.UVault.APIs.Operations.Mappers.Abstractions;
 using Kwality.UVault.APIs.Stores.Abstractions;
 
-[PublicAPI]
 public class ApiManager<TModel, TKey>(IApiStore<TModel, TKey> store)
     where TModel : ApiModel<TKey>
     where TKey : IEquatable<TKey>

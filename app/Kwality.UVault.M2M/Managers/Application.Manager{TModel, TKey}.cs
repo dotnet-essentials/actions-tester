@@ -24,15 +24,12 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Managers;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Models;
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.Operations.Filters.Abstractions;
 using Kwality.UVault.M2M.Operations.Mappers.Abstractions;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
-[PublicAPI]
 public class ApplicationManager<TModel, TKey>(IApplicationStore<TModel, TKey> store)
     where TModel : ApplicationModel<TKey>
     where TKey : IEquatable<TKey>

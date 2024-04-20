@@ -26,9 +26,6 @@ namespace Kwality.UVault.Core.Keys;
 
 using global::System.Globalization;
 
-using JetBrains.Annotations;
-
-[PublicAPI]
 public sealed class IntKey(int value) : IEquatable<IntKey>
 {
     private readonly int value = value;
