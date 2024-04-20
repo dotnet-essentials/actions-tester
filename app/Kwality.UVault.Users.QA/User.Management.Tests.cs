@@ -315,7 +315,7 @@ public sealed class UserManagementTests
     internal void UseCustomDataStore_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
             options.UseDataStore<DataStore<Model, IntKey>, Model>();
         }));
@@ -343,7 +343,7 @@ public sealed class UserManagementTests
     internal void UseCustomDataStoreAsSingleton_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
             options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Singleton);
         }));
@@ -371,7 +371,7 @@ public sealed class UserManagementTests
     internal void UseCustomDataStoreAsScoped_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
             options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Scoped);
         }));
@@ -738,7 +738,17 @@ public sealed class UserManagementTests
         where TKey : IEquatable<TKey>
 #pragma warning restore CA1812
     {
-        public Task CreateAsync(TKey key, TData data, IUserDataOperationMapper mapper)
+        public Task CreateAsync(TKey key, TData data)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task UpdateAsync(TKey key, TData data)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task DeleteAsync(TKey key)
         {
             throw new NotSupportedException();
         }

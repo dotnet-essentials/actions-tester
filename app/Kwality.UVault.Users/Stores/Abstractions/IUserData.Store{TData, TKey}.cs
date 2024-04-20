@@ -24,11 +24,11 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Users.Stores.Abstractions;
 
-using Kwality.UVault.Users.Operations.Mappers.Abstractions;
-
 public interface IUserDataStore<in TData, in TKey>
     where TData : class
     where TKey : IEquatable<TKey>
 {
-    Task CreateAsync(TKey key, TData data, IUserDataOperationMapper mapper);
+    Task CreateAsync(TKey key, TData data);
+    Task UpdateAsync(TKey key, TData data);
+    Task DeleteAsync(TKey key);
 }

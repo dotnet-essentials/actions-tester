@@ -75,4 +75,29 @@ public static class UVaultOptionsExtensions
 
         action.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
     }
+
+    public static void UseUserManagement<TModel, TKey, TData>(
+        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>> action)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TData : class
+    {
+        options.UseUserManagement<TModel, TKey, TData>(action, ServiceLifetime.Scoped);
+    }
+
+    public static void UseUserManagement<TModel, TKey, TData>(
+        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>> action, ServiceLifetime storeLifetime)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TData : class
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(action);
+        options.Services.AddScoped<UserManager<TModel, TKey, TData>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
+
+        action.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
+    }
 }

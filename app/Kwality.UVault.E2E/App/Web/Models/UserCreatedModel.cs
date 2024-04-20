@@ -1,4 +1,4 @@
-// =====================================================================================================================
+﻿// =====================================================================================================================
 // = LICENSE:       Copyright (c) 2023 Kevin De Coninck
 // =
 // =                Permission is hereby granted, free of charge, to any person
@@ -22,10 +22,12 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.Users.Operations.Mappers.Abstractions;
+namespace Kwality.UVault.E2E.App.Web.Models;
 
-public interface IUserDataOperationMapper
+internal sealed class UserCreatedModel(string id, string email, string firstName, string lastName)
 {
-    TDestination Create<TSource, TDestination>(TSource source)
-        where TDestination : class;
+    public string Id { get; set; } = id;
+    public string Email { get; set; } = email;
+    public string FirstName { get; set; } = firstName;
+    public string LastName { get; set; } = lastName;
 }

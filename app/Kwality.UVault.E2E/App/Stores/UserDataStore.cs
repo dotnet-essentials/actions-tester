@@ -24,25 +24,51 @@
 // =====================================================================================================================
 namespace Kwality.UVault.E2E.App.Stores;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.E2E.App.Db.Context;
 using Kwality.UVault.E2E.App.Db.Entities;
 using Kwality.UVault.E2E.App.Models;
-using Kwality.UVault.Users.Operations.Mappers.Abstractions;
 using Kwality.UVault.Users.Stores.Abstractions;
 
+using Microsoft.EntityFrameworkCore;
 
 #pragma warning disable CA1812
 internal sealed class UserDataStore(E2EDbContext dbContext) : IUserDataStore<UserData, StringKey>
 #pragma warning restore CA1812
 {
-    public async Task CreateAsync(StringKey key, UserData data, IUserDataOperationMapper mapper)
+    public async Task CreateAsync(StringKey key, UserData data)
     {
         dbContext.Users.Add(new User { ExternalId = key.Value, UserEmail = data.Email });
 
         await dbContext.SaveChangesAsync()
                        .ConfigureAwait(false);
+    }
+
+    public async Task UpdateAsync(StringKey key, UserData data)
+    {
+        User? user = await dbContext.Users.FirstOrDefaultAsync(user => user.ExternalId == key.Value)
+                                    .ConfigureAwait(false);
+
+        if (user != null)
+        {
+            user.UserEmail = data.Email;
+
+            await dbContext.SaveChangesAsync()
+                           .ConfigureAwait(false);
+        }
+    }
+
+    public async Task DeleteAsync(StringKey key)
+    {
+        User? user = await dbContext.Users.FirstOrDefaultAsync(user => user.ExternalId == key.Value)
+                                    .ConfigureAwait(false);
+
+        if (user != null)
+        {
+            dbContext.Users.Remove(user);
+
+            await dbContext.SaveChangesAsync()
+                           .ConfigureAwait(false);
+        }
     }
 }

@@ -24,15 +24,12 @@
 // =====================================================================================================================
 namespace Kwality.UVault.E2E.App.Builders;
 
-using System.Net;
-
 using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Extensions;
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.E2E.App.Db.Context;
 using Kwality.UVault.E2E.App.Models;
 using Kwality.UVault.E2E.App.Models.Mappers;
-using Kwality.UVault.E2E.App.Models.Operations.Mappers;
 using Kwality.UVault.E2E.App.Stores;
 using Kwality.UVault.E2E.App.Web.Models;
 using Kwality.UVault.QA.Common.System;
@@ -43,6 +40,7 @@ using Kwality.UVault.Users.Managers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
@@ -64,7 +62,7 @@ internal static class E2EApplicationBuilder
 
         services.AddUVault(static options =>
         {
-            options.UseUserManagement<UserModel, StringKey>(static userManagementOptions =>
+            options.UseUserManagement<UserModel, StringKey, UserData>(static userManagementOptions =>
             {
                 userManagementOptions.UseAuth0Store<UserModel, UserModelMapper>(GetApiConfiguration());
                 userManagementOptions.UseDataStore<UserDataStore, UserData>();
@@ -77,20 +75,45 @@ internal static class E2EApplicationBuilder
     private static void ConfigureApp(IApplicationBuilder app)
     {
         app.UseRouting();
-        app.UseEndpoints(static builder => { builder.MapPost("/api/v1/users/", HandleCreateUsersAsync); });
+        app.UseEndpoints(static builder => { builder.MapPost("/api/v1/users/", HandleCreateUserAsync); });
+        app.UseEndpoints(static builder => { builder.MapPut("/api/v1/users/{id}", HandleUpdateUserAsync); });
+        app.UseEndpoints(static builder => { builder.MapDelete("/api/v1/users/{id}", HandleDeleteUserAsync); });
     }
 
-    private static async Task HandleCreateUsersAsync(
-        HttpContext context, UserManager<UserModel, StringKey, UserData> userManager, UserCreateModel model)
+    private static async Task<IResult> HandleCreateUserAsync(
+        [FromServices] UserManager<UserModel, StringKey, UserData> userManager, [FromBody] UserCreateModel model)
     {
         var userModel = new UserModel(new StringKey(model.Email), model.FirstName, model.LastName, model.Password);
         var userData = new UserData(model.Email);
 
-        await userManager.CreateAsync(userModel, userData, new UserCreateOperationMapper(),
-                             new UserDataCreateOperationMapper())
+        StringKey key = await userManager.CreateAsync(userModel, userData, new UserCreateOperationMapper())
+                                         .ConfigureAwait(false);
+
+        return Results.Ok(new UserCreatedModel(key.Value, model.Email, model.FirstName, model.LastName));
+    }
+
+    private static async Task<IResult> HandleUpdateUserAsync(
+        [FromServices] UserManager<UserModel, StringKey, UserData> userManager, [FromRoute] string id,
+        [FromBody] UserUpdateModel model)
+    {
+        var userData = new UserData(model.Email);
+
+        await userManager.UpdateDataByKeyAsync(new StringKey(id), userData)
                          .ConfigureAwait(false);
 
-        context.Response.StatusCode = (int)HttpStatusCode.OK;
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> HandleDeleteUserAsync(
+        [FromServices] UserManager<UserModel, StringKey, UserData> userManager, [FromRoute] string id)
+    {
+        await userManager.DeleteByKeyAsync(new StringKey(id))
+                         .ConfigureAwait(false);
+
+        await userManager.DeleteDataByKeyAsync(new StringKey(id))
+                         .ConfigureAwait(false);
+
+        return Results.Ok();
     }
 
     private static ApiConfiguration GetApiConfiguration()

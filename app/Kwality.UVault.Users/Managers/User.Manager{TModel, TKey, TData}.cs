@@ -43,13 +43,12 @@ public class UserManager<TModel, TKey, TData>(IUserStore<TModel, TKey> store, IU
         return store.GetByEmailAsync(email);
     }
 
-    public async Task<TKey> CreateAsync(
-        TModel model, TData data, IUserOperationMapper mapper, IUserDataOperationMapper dataMapper)
+    public async Task<TKey> CreateAsync(TModel model, TData data, IUserOperationMapper mapper)
     {
         TKey key = await store.CreateAsync(model, mapper)
                               .ConfigureAwait(false);
 
-        await dataStore.CreateAsync(key, data, dataMapper)
+        await dataStore.CreateAsync(key, data)
                        .ConfigureAwait(false);
 
         return key;
@@ -60,8 +59,18 @@ public class UserManager<TModel, TKey, TData>(IUserStore<TModel, TKey> store, IU
         return store.UpdateAsync(key, model, mapper);
     }
 
+    public Task UpdateDataByKeyAsync(TKey key, TData data)
+    {
+        return dataStore.UpdateAsync(key, data);
+    }
+
     public Task DeleteByKeyAsync(TKey key)
     {
         return store.DeleteByKeyAsync(key);
+    }
+
+    public Task DeleteDataByKeyAsync(TKey key)
+    {
+        return dataStore.DeleteAsync(key);
     }
 }

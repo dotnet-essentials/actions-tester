@@ -22,23 +22,9 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.E2E.App.Models.Operations.Mappers;
+namespace Kwality.UVault.E2E.App.Web.Models;
 
-using Kwality.UVault.Core.Exceptions;
-using Kwality.UVault.Core.Helpers;
-using Kwality.UVault.Users.Operations.Mappers.Abstractions;
-
-internal sealed class UserDataCreateOperationMapper : IUserDataOperationMapper
+internal sealed class UserUpdateModel(string email)
 {
-    public TDestination Create<TSource, TDestination>(TSource source)
-        where TDestination : class
-    {
-        if (typeof(TDestination) != typeof(TSource))
-        {
-            throw new CreateException(
-                $"Invalid {nameof(IUserOperationMapper)}: Destination is NOT `{typeof(TSource).Name}`.");
-        }
-
-        return source.UnsafeAs<TSource, TDestination>();
-    }
+    public string Email { get; set; } = email;
 }

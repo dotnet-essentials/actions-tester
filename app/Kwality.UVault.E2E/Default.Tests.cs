@@ -42,19 +42,51 @@ using Xunit;
 public sealed class DefaultTests
 {
     [Fact]
-    public async Task CreateUserAsync()
+    public async Task RunAsync()
     {
         // ARRANGE.
         using var server = new TestServer(E2EApplicationBuilder.CreateApplication());
         using HttpClient httpClient = server.CreateClient();
 
         // ACT.
+        string userId = await CreateUserAsync(httpClient)
+            .ConfigureAwait(true);
+
+        await UpdateUserAsync(httpClient, userId)
+            .ConfigureAwait(true);
+
+        await DeleteUserAsync(httpClient, userId)
+            .ConfigureAwait(true);
+
+        Assert.True(true);
+    }
+
+    private static async Task<string> CreateUserAsync(HttpClient httpClient)
+    {
         var userModel = new UserCreateModel("kevin.dconinck@gmail.com", "Kevin", "De Coninck", "MySecur3Passw0rd!!!");
         using var json = JsonContent.Create(userModel);
 
-        await httpClient.PostAsync(new Uri("/api/v1/users", UriKind.Relative), json)
-                        .ConfigureAwait(true);
+        HttpResponseMessage response = await httpClient.PostAsync(new Uri("/api/v1/users", UriKind.Relative), json)
+                                                       .ConfigureAwait(true);
 
-        Assert.True(true);
+        UserCreatedModel? responseModel = await response.Content.ReadFromJsonAsync<UserCreatedModel>()
+                                                        .ConfigureAwait(true);
+
+        return responseModel?.Id ?? string.Empty;
+    }
+
+    private static async Task UpdateUserAsync(HttpClient httpClient, string userId)
+    {
+        var userModel = new UserUpdateModel("kevin.dconinck+updated@gmail.com");
+        using var json = JsonContent.Create(userModel);
+
+        await httpClient.PutAsync(new Uri($"/api/v1/users/{userId}", UriKind.Relative), json)
+                        .ConfigureAwait(true);
+    }
+
+    private static async Task DeleteUserAsync(HttpClient httpClient, string userId)
+    {
+        await httpClient.DeleteAsync(new Uri($"/api/v1/users/{userId}", UriKind.Relative))
+                        .ConfigureAwait(true);
     }
 }
