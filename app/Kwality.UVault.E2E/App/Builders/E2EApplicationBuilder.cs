@@ -64,7 +64,7 @@ internal static class E2EApplicationBuilder
 
         services.AddUVault(static options =>
         {
-            options.UseUserManagement<UserModel, StringKey, UserData>(static userManagementOptions =>
+            options.UseUserManagement<UserModel, StringKey>(static userManagementOptions =>
             {
                 userManagementOptions.UseAuth0Store<UserModel, UserModelMapper>(GetApiConfiguration());
                 userManagementOptions.UseDataStore<UserDataStore, UserData>();
