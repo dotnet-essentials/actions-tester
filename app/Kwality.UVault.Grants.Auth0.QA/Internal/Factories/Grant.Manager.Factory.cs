@@ -36,7 +36,7 @@ internal sealed class GrantManagerFactory
 {
     private readonly IServiceCollection serviceCollection = new ServiceCollection();
 
-    public GrantManager<TModel, TKey> Create<TModel, TKey>(Action<GrantManagementOptions<TModel, TKey>>? action)
+    public GrantManager<TModel, TKey> Create<TModel, TKey>(Action<GrantManagementOptions<TModel, TKey>> action)
         where TModel : GrantModel<TKey>
         where TKey : IEquatable<TKey>
     {

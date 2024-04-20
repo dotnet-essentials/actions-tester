@@ -42,19 +42,10 @@ public static class UVaultOptionsExtensions
         where TModel : UserModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        options.UseUserManagement<TModel, TKey>(null);
+        options.UseUserManagement<TModel, TKey>(ServiceLifetime.Scoped);
     }
 
     public static void UseUserManagement<TModel, TKey>(this UVaultOptions options, ServiceLifetime storeLifetime)
-        where TModel : UserModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        options.UseUserManagement<TModel, TKey>(null, storeLifetime);
-    }
-
-    public static void UseUserManagement<TModel, TKey>(
-        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>>? action,
-        ServiceLifetime storeLifetime = ServiceLifetime.Scoped)
         where TModel : UserModel<TKey>
         where TKey : IEquatable<TKey>
     {
@@ -63,9 +54,29 @@ public static class UVaultOptionsExtensions
 
         options.Services.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
             storeLifetime));
+    }
 
-        // Configure UVault's User Management component.
-        action?.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
+    public static void UseUserManagement<TModel, TKey>(
+        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>> action)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        options.UseUserManagement(action, ServiceLifetime.Scoped);
+    }
+
+    public static void UseUserManagement<TModel, TKey>(
+        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>> action, ServiceLifetime storeLifetime)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(action);
+        options.Services.AddScoped<UserManager<TModel, TKey>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
+
+        action.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
     }
 
     public static void UseUserManagement<TModel, TKey, TData>(this UVaultOptions options)
@@ -73,20 +84,10 @@ public static class UVaultOptionsExtensions
         where TKey : IEquatable<TKey>
         where TData : class
     {
-        options.UseUserManagement<TModel, TKey, TData>(null);
+        options.UseUserManagement<TModel, TKey, TData>(ServiceLifetime.Scoped);
     }
 
     public static void UseUserManagement<TModel, TKey, TData>(this UVaultOptions options, ServiceLifetime storeLifetime)
-        where TModel : UserModel<TKey>
-        where TKey : IEquatable<TKey>
-        where TData : class
-    {
-        options.UseUserManagement<TModel, TKey, TData>(null, storeLifetime);
-    }
-
-    public static void UseUserManagement<TModel, TKey, TData>(
-        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>>? action,
-        ServiceLifetime storeLifetime = ServiceLifetime.Scoped)
         where TModel : UserModel<TKey>
         where TKey : IEquatable<TKey>
         where TData : class
@@ -96,8 +97,30 @@ public static class UVaultOptionsExtensions
 
         options.Services.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
             storeLifetime));
+    }
 
-        // Configure UVault's User Management component.
-        action?.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
+    public static void UseUserManagement<TModel, TKey, TData>(
+        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>> action)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TData : class
+    {
+        options.UseUserManagement<TModel, TKey, TData>(action, ServiceLifetime.Scoped);
+    }
+
+    public static void UseUserManagement<TModel, TKey, TData>(
+        this UVaultOptions options, Action<UserManagementOptions<TModel, TKey>> action, ServiceLifetime storeLifetime)
+        where TModel : UserModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TData : class
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(action);
+        options.Services.AddScoped<UserManager<TModel, TKey, TData>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IUserStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
+
+        action.Invoke(new UserManagementOptions<TModel, TKey>(options.Services));
     }
 }

@@ -49,8 +49,6 @@ public static class UVaultOptionsExtensions
             = options.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
 
         var iamOptions = new IAMOptions(authenticationBuilder);
-
-        // Configure UVault's IAM component.
         action.Invoke(iamOptions);
 
         // Add ASP.NET's services to support authorization.

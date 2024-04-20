@@ -42,19 +42,10 @@ public static class UVaultOptionsExtensions
         where TModel : GrantModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        options.UseGrantManagement<TModel, TKey>(null);
+        options.UseGrantManagement<TModel, TKey>(ServiceLifetime.Scoped);
     }
 
     public static void UseGrantManagement<TModel, TKey>(this UVaultOptions options, ServiceLifetime storeLifetime)
-        where TModel : GrantModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        options.UseGrantManagement<TModel, TKey>(null, storeLifetime);
-    }
-
-    public static void UseGrantManagement<TModel, TKey>(
-        this UVaultOptions options, Action<GrantManagementOptions<TModel, TKey>>? action,
-        ServiceLifetime storeLifetime = ServiceLifetime.Scoped)
         where TModel : GrantModel<TKey>
         where TKey : IEquatable<TKey>
     {
@@ -63,8 +54,28 @@ public static class UVaultOptionsExtensions
 
         options.Services.Add(new ServiceDescriptor(typeof(IGrantStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
             storeLifetime));
+    }
 
-        // Configure UVault's User Management component.
-        action?.Invoke(new GrantManagementOptions<TModel, TKey>(options.Services));
+    public static void UseGrantManagement<TModel, TKey>(
+        this UVaultOptions options, Action<GrantManagementOptions<TModel, TKey>> action)
+        where TModel : GrantModel<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        options.UseGrantManagement(action, ServiceLifetime.Scoped);
+    }
+
+    public static void UseGrantManagement<TModel, TKey>(
+        this UVaultOptions options, Action<GrantManagementOptions<TModel, TKey>> action, ServiceLifetime storeLifetime)
+        where TModel : GrantModel<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(action);
+        options.Services.AddScoped<GrantManager<TModel, TKey>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IGrantStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
+
+        action.Invoke(new GrantManagementOptions<TModel, TKey>(options.Services));
     }
 }

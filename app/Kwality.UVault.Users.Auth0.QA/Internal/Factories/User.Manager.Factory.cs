@@ -36,7 +36,7 @@ internal sealed class UserManagerFactory
 {
     private readonly IServiceCollection serviceCollection = new ServiceCollection();
 
-    public UserManager<TModel, TKey> Create<TModel, TKey>(Action<UserManagementOptions<TModel, TKey>>? action)
+    public UserManager<TModel, TKey> Create<TModel, TKey>(Action<UserManagementOptions<TModel, TKey>> action)
         where TModel : UserModel<TKey>
         where TKey : IEquatable<TKey>
     {

@@ -95,8 +95,6 @@ public static class UVaultOptionsExtensions
             typeof(StaticStore<TModel, TKey>), storeLifetime));
 
         options.Services.AddScoped<IApplicationStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-
-        // Configure UVault's M2M management component.
         applicationManagementOptions?.Invoke(new ApplicationManagementOptions<TModel, TKey>(options.Services));
     }
 
@@ -107,8 +105,6 @@ public static class UVaultOptionsExtensions
     {
         options.Services.AddScoped<ApplicationTokenManager<TToken>>();
         options.Services.AddScoped<IApplicationTokenStore<TToken>, StaticTokenStore<TToken>>();
-
-        // Configure UVault's User M2M Token management component.
         applicationTokenManagementOptions?.Invoke(new ApplicationTokenManagementOptions<TToken>(options.Services));
     }
 }

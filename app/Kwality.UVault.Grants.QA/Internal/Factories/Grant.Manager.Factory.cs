@@ -46,7 +46,7 @@ internal sealed class GrantManagerFactory
                    .GetRequiredService<GrantManager<TModel, TKey>>();
     }
 
-    public GrantManager<TModel, TKey> Create<TModel, TKey>(Action<GrantManagementOptions<TModel, TKey>>? action)
+    public GrantManager<TModel, TKey> Create<TModel, TKey>(Action<GrantManagementOptions<TModel, TKey>> action)
         where TModel : GrantModel<TKey>
         where TKey : IEquatable<TKey>
     {

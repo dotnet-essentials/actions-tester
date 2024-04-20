@@ -36,7 +36,7 @@ internal sealed class ApiManagerFactory
 {
     private readonly IServiceCollection serviceCollection = new ServiceCollection();
 
-    public ApiManager<TModel, TKey> Create<TModel, TKey>(Action<ApiManagementOptions<TModel, TKey>>? action)
+    public ApiManager<TModel, TKey> Create<TModel, TKey>(Action<ApiManagementOptions<TModel, TKey>> action)
         where TModel : ApiModel<TKey>
         where TKey : IEquatable<TKey>
     {

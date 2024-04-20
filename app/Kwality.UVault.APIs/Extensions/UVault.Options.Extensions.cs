@@ -42,19 +42,10 @@ public static class UVaultOptionsExtensions
         where TModel : ApiModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        options.UseApiManagement<TModel, TKey>(null);
+        options.UseApiManagement<TModel, TKey>(ServiceLifetime.Scoped);
     }
 
     public static void UseApiManagement<TModel, TKey>(this UVaultOptions options, ServiceLifetime storeLifetime)
-        where TModel : ApiModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        options.UseApiManagement<TModel, TKey>(null);
-    }
-
-    public static void UseApiManagement<TModel, TKey>(
-        this UVaultOptions options, Action<ApiManagementOptions<TModel, TKey>>? action,
-        ServiceLifetime storeLifetime = ServiceLifetime.Scoped)
         where TModel : ApiModel<TKey>
         where TKey : IEquatable<TKey>
     {
@@ -63,8 +54,28 @@ public static class UVaultOptionsExtensions
 
         options.Services.Add(new ServiceDescriptor(typeof(IApiStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
             storeLifetime));
+    }
 
-        // Configure UVault's User Management component.
-        action?.Invoke(new ApiManagementOptions<TModel, TKey>(options.Services));
+    public static void UseApiManagement<TModel, TKey>(
+        this UVaultOptions options, Action<ApiManagementOptions<TModel, TKey>> action)
+        where TModel : ApiModel<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        options.UseApiManagement(action, ServiceLifetime.Scoped);
+    }
+
+    public static void UseApiManagement<TModel, TKey>(
+        this UVaultOptions options, Action<ApiManagementOptions<TModel, TKey>> action, ServiceLifetime storeLifetime)
+        where TModel : ApiModel<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(action);
+        options.Services.AddScoped<ApiManager<TModel, TKey>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IApiStore<TModel, TKey>), typeof(StaticStore<TModel, TKey>),
+            storeLifetime));
+
+        action.Invoke(new ApiManagementOptions<TModel, TKey>(options.Services));
     }
 }
