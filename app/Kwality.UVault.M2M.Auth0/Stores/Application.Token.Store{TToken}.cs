@@ -48,7 +48,7 @@ internal sealed class ApplicationTokenStore<TToken>(
     Auth0Options options) : IApplicationTokenStore<TToken>
     where TToken : TokenModel
 {
-    private const string readError = "Failed to retrieve access token.";
+    private const string readError = "Failed to retrieve an access token.";
 
     public async Task<TToken> GetAccessTokenAsync(
         string clientId, string clientSecret, string audience, string grantType)
