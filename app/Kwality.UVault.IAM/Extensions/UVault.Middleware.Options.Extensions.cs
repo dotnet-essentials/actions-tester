@@ -32,7 +32,6 @@ using Kwality.UVault.Core.Options;
 
 using Microsoft.AspNetCore.Builder;
 
-[PublicAPI]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public static class UVaultMiddlewareOptionsExtensions
 {

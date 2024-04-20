@@ -37,7 +37,7 @@ public sealed class M2MTokenManagementAttribute : Attribute, ITraitAttribute
     // NOTE: Intentionally left blank.
 }
 
-[UsedImplicitly]
+
 #pragma warning disable CA1812
 internal sealed class M2MTokenManagementFeatureDiscoverer : ITraitDiscoverer
 #pragma warning restore CA1812

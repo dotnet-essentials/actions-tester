@@ -38,7 +38,6 @@ using Kwality.UVault.M2M.Options;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class ApplicationTokenManagementOptionsExtensions
 {
     public static void UseAuth0Store<TToken, TMapper>(

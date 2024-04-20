@@ -478,7 +478,6 @@ public sealed class ApiManagementTests
         where TModel : ApiModel<TKey>
         where TKey : IEquatable<TKey>;
 
-    [UsedImplicitly]
 #pragma warning disable CA1812
     internal sealed class Model(IntKey name) : ApiModel<IntKey>(name);
 #pragma warning restore CA1812
@@ -498,7 +497,6 @@ public sealed class ApiManagementTests
         }
     }
 
-    [UsedImplicitly]
 #pragma warning disable CA1812
     private sealed class Store : IApiStore<Model, IntKey>
 #pragma warning restore CA1812

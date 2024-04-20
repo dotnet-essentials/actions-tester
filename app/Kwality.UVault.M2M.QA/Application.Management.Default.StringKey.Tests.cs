@@ -355,7 +355,7 @@ public sealed class ApplicationManagementDefaultStringKeyTests
         }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     internal sealed class Model : ApplicationModel<StringKey>
 #pragma warning restore CA1812

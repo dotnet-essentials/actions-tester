@@ -36,7 +36,7 @@ public sealed class E2EAttribute : Attribute, ITraitAttribute
     // NOTE: Intentionally left blank.
 }
 
-[UsedImplicitly]
+
 #pragma warning disable CA1812
 internal sealed class E2ETargetDiscoverer : ITraitDiscoverer
 #pragma warning restore CA1812

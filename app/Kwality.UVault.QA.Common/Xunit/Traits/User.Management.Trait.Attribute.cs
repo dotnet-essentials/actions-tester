@@ -36,7 +36,7 @@ public sealed class UserManagementAttribute : Attribute, ITraitAttribute
     // NOTE: Intentionally left blank.
 }
 
-[UsedImplicitly]
+
 #pragma warning disable CA1812
 internal sealed class UserManagementFeatureDiscoverer : ITraitDiscoverer
 #pragma warning restore CA1812

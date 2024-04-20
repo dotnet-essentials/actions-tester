@@ -783,7 +783,7 @@ public sealed class ApplicationManagementTests
         }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     internal sealed class Store : IApplicationStore<Model, IntKey>
 #pragma warning restore CA1812

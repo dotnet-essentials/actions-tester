@@ -28,8 +28,6 @@ using AutoFixture.Xunit2;
 
 using FluentAssertions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Operations.Mappers;
 using Kwality.UVault.APIs.Operations.Mappers.Abstractions;
 using Kwality.UVault.Core.Exceptions;
@@ -72,13 +70,13 @@ public sealed class ApiCreateOperationMapperTests
     internal sealed class ModelOne
 #pragma warning restore CA1812
     {
-        [UsedImplicitly] public string? Name { get; set; }
+        public string? Name { get; set; }
     }
 
 #pragma warning disable CA1812
     internal sealed class ModelTwo
 #pragma warning restore CA1812
     {
-        [UsedImplicitly] public string? Name { get; set; }
+        public string? Name { get; set; }
     }
 }

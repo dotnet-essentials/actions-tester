@@ -33,7 +33,6 @@ using Kwality.UVault.IAM.Validators.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 #pragma warning disable S101
 public sealed class IAMOptions

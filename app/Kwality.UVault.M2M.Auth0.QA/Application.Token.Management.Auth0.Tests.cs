@@ -172,7 +172,7 @@ public sealed class ApplicationTokenManagementAuth0Tests
         }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     private sealed class ModelMapper : IModelMapper<Model>
 #pragma warning restore CA1812
@@ -186,7 +186,7 @@ public sealed class ApplicationTokenManagementAuth0Tests
         }
     }
 
-    [UsedImplicitly]
+    
     internal sealed class TokenModel : M2M.Models.TokenModel
     {
         public TokenModel()
@@ -202,7 +202,7 @@ public sealed class ApplicationTokenManagementAuth0Tests
         }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     private sealed class TokenModelMapper : IModelTokenMapper<TokenModel>
 #pragma warning restore CA1812

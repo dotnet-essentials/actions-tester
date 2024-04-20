@@ -43,7 +43,7 @@ using Kwality.UVault.Users.Auth0.Options;
 using Kwality.UVault.Users.Operations.Mappers.Abstractions;
 using Kwality.UVault.Users.Stores.Abstractions;
 
-[UsedImplicitly]
+
 internal sealed class UserStore<TModel>(
     ManagementClient managementClient,
     ApiConfiguration apiConfiguration,

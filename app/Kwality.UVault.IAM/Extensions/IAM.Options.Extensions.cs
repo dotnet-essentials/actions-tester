@@ -26,14 +26,11 @@ namespace Kwality.UVault.IAM.Extensions;
 
 using System.Diagnostics.CodeAnalysis;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.IAM.Internal.Validators;
 using Kwality.UVault.IAM.Options;
 
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 #pragma warning disable S101
 public static class IAMOptionsExtensions

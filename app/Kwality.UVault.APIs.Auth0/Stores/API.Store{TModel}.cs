@@ -43,7 +43,6 @@ using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Keys;
 
-[UsedImplicitly]
 internal sealed class ApiStore<TModel>(
     ManagementClient client,
     ApiConfiguration configuration,

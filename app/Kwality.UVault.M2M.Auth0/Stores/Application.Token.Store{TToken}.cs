@@ -40,7 +40,7 @@ using Kwality.UVault.M2M.Auth0.Options;
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
-[UsedImplicitly]
+
 internal sealed class ApplicationTokenStore<TToken>(
     ManagementClient managementClient,
     M2MConfiguration m2MConfiguration,

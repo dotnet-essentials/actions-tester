@@ -758,7 +758,7 @@ public sealed class UserManagementTests
         where TModel : UserModel<TKey>
         where TKey : IEquatable<TKey>;
 
-    [UsedImplicitly]
+    
     internal sealed class Model(IntKey key, string email) : UserModel<IntKey>(key, email);
 
     private sealed class CreateOperationMapper : IUserOperationMapper
@@ -791,7 +791,7 @@ public sealed class UserManagementTests
         }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     internal sealed class Store : IUserStore<Model, IntKey>
 #pragma warning restore CA1812

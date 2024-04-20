@@ -35,7 +35,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 
-[PublicAPI]
 public static class UVaultOptionsExtensions
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]

@@ -438,7 +438,7 @@ public sealed class UserManagementAuth0Tests
         public string? FirstName { get; set; }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     private sealed class ModelMapper : IModelMapper<Model>
 #pragma warning restore CA1812

@@ -117,7 +117,6 @@ public sealed class ApiManagementDefaultStringKeyTests
                  .ConfigureAwait(true);
     }
 
-    [UsedImplicitly]
 #pragma warning disable CA1812
     internal sealed class Model(StringKey name) : ApiModel<StringKey>(name);
 #pragma warning restore CA1812

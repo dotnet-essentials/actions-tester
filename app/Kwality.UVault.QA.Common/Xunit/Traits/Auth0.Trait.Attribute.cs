@@ -36,7 +36,7 @@ public sealed class Auth0Attribute : Attribute, ITraitAttribute
     // NOTE: Intentionally left blank.
 }
 
-[UsedImplicitly]
+
 #pragma warning disable CA1812
 internal sealed class Auth0TargetDiscoverer : ITraitDiscoverer
 #pragma warning restore CA1812

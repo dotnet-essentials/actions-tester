@@ -355,7 +355,7 @@ public sealed class ApplicationManagementDefaultIntKeyTests
         }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     internal sealed class Model : ApplicationModel<IntKey>
 #pragma warning restore CA1812

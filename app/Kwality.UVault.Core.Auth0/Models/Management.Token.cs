@@ -26,17 +26,15 @@ namespace Kwality.UVault.Core.Auth0.Models;
 
 using global::System.Text.Json.Serialization;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.System.Abstractions;
 
 public sealed class ApiManagementToken
 {
     private readonly DateTime issuedTimeStamp = DateTime.Now;
-    [JsonPropertyName("access_token")] public string? AccessToken { get; [UsedImplicitly] set; }
-    [JsonPropertyName("expires_in")] public int ExpiresIn { get; [UsedImplicitly] set; }
-    [JsonPropertyName("token_type")] public string TokenType { get; [UsedImplicitly] set; } = string.Empty;
-    [JsonPropertyName("scope")] public string Scope { get; [UsedImplicitly] set; } = string.Empty;
+    [JsonPropertyName("access_token")] public string? AccessToken { get; set; }
+    [JsonPropertyName("expires_in")] public int ExpiresIn { get; set; }
+    [JsonPropertyName("token_type")] public string TokenType { get; set; } = string.Empty;
+    [JsonPropertyName("scope")] public string Scope { get; set; } = string.Empty;
 
     // NOTE: A token is expired one the amount of seconds (see "Expired In") is passed.
     //       To ensure that we don't use an expired token, a safety mechanism is built in.

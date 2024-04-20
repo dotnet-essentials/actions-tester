@@ -30,8 +30,6 @@ using FluentAssertions;
 
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Grants.Auth0.Operations.Mappers;
 using Kwality.UVault.Grants.Operations.Mappers.Abstractions;
@@ -83,13 +81,13 @@ public sealed class Auth0GrantCreateOperationMapperTests
     internal sealed class ModelOne
 #pragma warning restore CA1812
     {
-        [UsedImplicitly] public string? Name { get; set; }
+        public string? Name { get; set; }
     }
 
 #pragma warning disable CA1812
     internal sealed class ModelTwo
 #pragma warning restore CA1812
     {
-        [UsedImplicitly] public string? Name { get; set; }
+        public string? Name { get; set; }
     }
 }

@@ -32,7 +32,6 @@ using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.M2M.Operations.Filters.Abstractions;
 
-[PublicAPI]
 public abstract class Auth0ApplicationFilter : IApplicationFilter
 {
     public TDestination Create<TDestination>()

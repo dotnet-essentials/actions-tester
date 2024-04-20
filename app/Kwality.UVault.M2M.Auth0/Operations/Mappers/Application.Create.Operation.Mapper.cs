@@ -32,7 +32,6 @@ using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.M2M.Operations.Mappers.Abstractions;
 
-[PublicAPI]
 public abstract class Auth0ApplicationCreateOperationMapper : IApplicationOperationMapper
 {
     public TDestination Create<TSource, TDestination>(TSource source)

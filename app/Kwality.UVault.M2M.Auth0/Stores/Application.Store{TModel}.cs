@@ -46,7 +46,7 @@ using Kwality.UVault.M2M.Operations.Filters.Abstractions;
 using Kwality.UVault.M2M.Operations.Mappers.Abstractions;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
-[UsedImplicitly]
+
 internal sealed class ApplicationStore<TModel>(
     ManagementClient managementClient,
     ApiConfiguration apiConfiguration,

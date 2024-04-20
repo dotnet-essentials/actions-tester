@@ -39,7 +39,7 @@ public sealed class M2MManagementAttribute : Attribute, ITraitAttribute
     // NOTE: Intentionally left blank.
 }
 
-[UsedImplicitly]
+
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 #pragma warning disable CA1812
 internal sealed class M2MManagementFeatureDiscoverer : ITraitDiscoverer

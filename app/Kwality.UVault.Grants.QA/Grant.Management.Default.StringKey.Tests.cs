@@ -295,7 +295,7 @@ public sealed class GrantManagementDefaultStringKeyTests
         }
     }
 
-    [UsedImplicitly]
+    
 #pragma warning disable CA1812
     internal sealed class Model(StringKey key) : GrantModel<StringKey>(key)
 #pragma warning restore CA1812

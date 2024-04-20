@@ -31,7 +31,7 @@ using JetBrains.Annotations;
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.Users.Auth0.Mapping.Abstractions;
 
-[UsedImplicitly]
+
 #pragma warning disable CA1812
 internal sealed class UserModelMapper : IModelMapper<UserModel>
 #pragma warning restore CA1812

@@ -41,7 +41,7 @@ public sealed class IAMAttribute : Attribute, ITraitAttribute
     // NOTE: Intentionally left blank.
 }
 
-[UsedImplicitly]
+
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 #pragma warning disable CA1812
 #pragma warning disable S101

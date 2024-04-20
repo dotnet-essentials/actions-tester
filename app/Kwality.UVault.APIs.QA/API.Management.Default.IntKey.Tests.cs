@@ -117,7 +117,6 @@ public sealed class ApiManagementDefaultIntKeyTests
                  .ConfigureAwait(true);
     }
 
-    [UsedImplicitly]
 #pragma warning disable CA1812
     internal sealed class Model(IntKey name) : ApiModel<IntKey>(name);
 #pragma warning restore CA1812
