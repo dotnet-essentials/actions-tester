@@ -33,7 +33,6 @@ using FluentAssertions;
 using JetBrains.Annotations;
 
 using Kwality.UVault.Core.Extensions;
-using Kwality.UVault.Core.Keys;
 using Kwality.UVault.M2M.Extensions;
 using Kwality.UVault.M2M.Managers;
 using Kwality.UVault.M2M.Models;
@@ -47,38 +46,108 @@ using Xunit;
 
 public sealed class ApplicationTokenManagementTests
 {
-    private readonly ApplicationTokenManager<Model> manager
-        = new ApplicationTokenManagerFactory().Create<Model, ApplicationModel<IntKey>, IntKey>(static options =>
+    private readonly ApplicationTokenManager<Model> manager = new ApplicationTokenManagerFactory().Create<Model>(
+        static options =>
             options.UseStore<Store>());
 
     [AutoDomainData]
     [M2MTokenManagement]
-    [Theory(DisplayName = "When the store is configured as a `Singleton` one, it behaves as such.")]
-    internal void UseStoreAsSingleton_RegisterStoreAsSingleton(IServiceCollection services)
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefault_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseApplicationTokenManagement<Model, ApplicationModel<IntKey>, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Singleton)));
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>());
 
         // ASSERT.
         services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
+        services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
-                                                    descriptor.ImplementationType == typeof(Store));
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
     }
 
     [AutoDomainData]
     [M2MTokenManagement]
-    [Theory(DisplayName = "When the store is configured as a `Scoped` one, it behaves as such.")]
-    internal void UseStoreAsScoped_RegisterStoreAsScoped(IServiceCollection services)
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsSingleton_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseApplicationTokenManagement<Model, ApplicationModel<IntKey>, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Scoped)));
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(ServiceLifetime.Singleton));
 
         // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [AutoDomainData]
+    [M2MTokenManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(ServiceLifetime.Scoped));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [AutoDomainData]
+    [M2MTokenManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(ServiceLifetime.Transient));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient);
+    }
+
+    [AutoDomainData]
+    [M2MTokenManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStore_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(static options =>
+        {
+            options.UseStore<Store>();
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
@@ -87,19 +156,111 @@ public sealed class ApplicationTokenManagementTests
 
     [AutoDomainData]
     [M2MTokenManagement]
-    [Theory(DisplayName = "When the store is configured as a `Transient` one, it behaves as such.")]
-    internal void UseStoreAsTransient_RegisterStoreAsTransient(IServiceCollection services)
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsSingleton_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseApplicationTokenManagement<Model, ApplicationModel<IntKey>, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Transient)));
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(static options =>
+        {
+            options.UseStore<Store>(ServiceLifetime.Singleton);
+        }));
 
         // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
+                                                    descriptor.ImplementationType == typeof(Store));
+    }
+
+    [AutoDomainData]
+    [M2MTokenManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(static options =>
+        {
+            options.UseStore<Store>(ServiceLifetime.Scoped);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Store));
+    }
+
+    [AutoDomainData]
+    [M2MTokenManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(static options =>
+        {
+            options.UseStore<Store>(ServiceLifetime.Transient);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ApplicationTokenManager<Model>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(ApplicationTokenManager<Model>));
+
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApplicationTokenStore<Model>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Transient &&
                                                     descriptor.ImplementationType == typeof(Store));
+    }
+
+    [AutoDomainData]
+    [M2MTokenManagement]
+    [Theory(DisplayName = "When NO manager configured, it can be resolved.")]
+    internal void ResolveDefaultManager_RaisesNoException(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>());
+
+        // ACT.
+        Func<ApplicationTokenManager<Model>> act = () => services.BuildServiceProvider()
+                                                                 .GetRequiredService<ApplicationTokenManager<Model>>();
+
+        // ASSERT.
+        act.Should()
+           .NotThrow();
+    }
+
+    [AutoDomainData]
+    [M2MTokenManagement]
+    [Theory(DisplayName = "When a custom store is configured, it can be resolved.")]
+    internal void ResolveCustomStore_RaisesNoException(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseApplicationTokenManagement<Model>(static options =>
+        {
+            options.UseStore<Store>();
+        }));
+
+        // ACT.
+        Func<IApplicationTokenStore<Model>> act = () => services.BuildServiceProvider()
+                                                                .GetRequiredService<IApplicationTokenStore<Model>>();
+
+        // ASSERT.
+        act.Should()
+           .NotThrow();
     }
 
     [AutoData]

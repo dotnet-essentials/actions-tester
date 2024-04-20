@@ -36,11 +36,22 @@ internal sealed class ApplicationManagerFactory
 {
     private readonly IServiceCollection serviceCollection = new ServiceCollection();
 
-    public ApplicationManager<TModel, TKey> Create<TModel, TKey>(
-        Action<ApplicationManagementOptions<TModel, TKey>>? action)
+    public ApplicationManager<TModel, TKey> Create<TModel, TKey>()
         where TModel : ApplicationModel<TKey>
         where TKey : IEquatable<TKey>
     {
+        this.serviceCollection.AddUVault(static options => options.UseApplicationManagement<TModel, TKey>());
+
+        return this.serviceCollection.BuildServiceProvider()
+                   .GetRequiredService<ApplicationManager<TModel, TKey>>();
+    }
+
+    public ApplicationManager<TModel, TKey> Create<TModel, TKey>(
+        Action<ApplicationManagementOptions<TModel, TKey>> action)
+        where TModel : ApplicationModel<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        ArgumentNullException.ThrowIfNull(action);
         this.serviceCollection.AddUVault(options => options.UseApplicationManagement(action));
 
         return this.serviceCollection.BuildServiceProvider()

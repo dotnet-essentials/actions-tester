@@ -52,8 +52,88 @@ public sealed class UserManagementTests
 {
     [AutoDomainData]
     [UserManagement]
-    [Theory(DisplayName = "When a custom manager is configured, it's registered.")]
-    internal void UseManager_RegistersManager(IServiceCollection services)
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefault_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>());
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsSingleton_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(ServiceLifetime.Singleton));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(ServiceLifetime.Scoped));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(ServiceLifetime.Transient));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient);
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManager_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
@@ -64,25 +144,94 @@ public sealed class UserManagementTests
         // ASSERT.
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped);
     }
 
     [AutoDomainData]
     [UserManagement]
-    [Theory(DisplayName = "When a custom manager (with a custom store) is configured, it's registered.")]
-    internal void UseManagerStore_RegistersManager(IServiceCollection services)
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManagerAsSingleton_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options =>
+            options.UseUserManagement<Model, IntKey>(
+                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Singleton));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManagerAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options =>
+            options.UseUserManagement<Model, IntKey>(
+                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Scoped));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManagerAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options =>
+            options.UseUserManagement<Model, IntKey>(
+                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Transient));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient);
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStore_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<ManagerStore<Model, IntKey>>();
             options.UseStore<Store<Model, IntKey>>();
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ManagerStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -92,8 +241,209 @@ public sealed class UserManagementTests
 
     [AutoDomainData]
     [UserManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsSingleton_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        {
+            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Singleton);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
+                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        {
+            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Scoped);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        {
+            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Transient);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient &&
+                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom data store is configured, the services are added.")]
+    internal void UseCustomDataStore_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        {
+            options.UseDataStore<DataStore<Model, IntKey>, Model>();
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom data store is configured, the services are added.")]
+    internal void UseCustomDataStoreAsSingleton_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        {
+            options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Singleton);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
+                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom data store is configured, the services are added.")]
+    internal void UseCustomDataStoreAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        {
+            options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Scoped);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When a custom data store is configured, the services are added.")]
+    internal void UseCustomDataStoreAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        {
+            options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Transient);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(UserManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient &&
+                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When NO manager configured, it can be resolved.")]
+    internal void ResolveDefaultManager_RaisesNoException(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>());
+
+        // ACT.
+        Func<UserManager<Model, IntKey>> act = () => services.BuildServiceProvider()
+                                                             .GetRequiredService<UserManager<Model, IntKey>>();
+
+        // ASSERT.
+        act.Should()
+           .NotThrow();
+    }
+
+    [AutoDomainData]
+    [UserManagement]
     [Theory(DisplayName = "When a custom manager is configured, it can be resolved.")]
-    internal void ResolveManager_RaisesNoException(IServiceCollection services)
+    internal void ResolveCustomManager_RaisesNoException(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
@@ -113,7 +463,7 @@ public sealed class UserManagementTests
     [AutoDomainData]
     [UserManagement]
     [Theory(DisplayName = "When a custom manager is configured, it can be resolved.")]
-    internal void ResolveManagerStore_RaisesNoException(IServiceCollection services)
+    internal void ResolveCustomManagerWithStore_RaisesNoException(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
@@ -129,57 +479,6 @@ public sealed class UserManagementTests
         // ASSERT.
         act.Should()
            .NotThrow();
-    }
-
-    [AutoDomainData]
-    [UserManagement]
-    [Theory(DisplayName = "When the store is configured as a `Singleton` one, it behaves as such.")]
-    internal void UseStoreAsSingleton_RegisterStoreAsSingleton(IServiceCollection services)
-    {
-        // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseUserManagement<Model, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Singleton)));
-
-        // ASSERT.
-        services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
-                                                    descriptor.ImplementationType == typeof(Store));
-    }
-
-    [AutoDomainData]
-    [UserManagement]
-    [Theory(DisplayName = "When the store is configured as a `Scoped` one, it behaves as such.")]
-    internal void UseStoreAsScoped_RegisterStoreAsScoped(IServiceCollection services)
-    {
-        // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseUserManagement<Model, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Scoped)));
-
-        // ASSERT.
-        services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store));
-    }
-
-    [AutoDomainData]
-    [UserManagement]
-    [Theory(DisplayName = "When the store is configured as a `Transient` one, it behaves as such.")]
-    internal void UseStoreAsTransient_RegisterStoreAsTransient(IServiceCollection services)
-    {
-        // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseUserManagement<Model, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Transient)));
-
-        // ASSERT.
-        services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Transient &&
-                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoData]
@@ -430,6 +729,18 @@ public sealed class UserManagementTests
         }
 
         public Task DeleteByKeyAsync(TKey key)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+#pragma warning disable CA1812
+    private sealed class DataStore<TData, TKey> : IUserDataStore<TData, TKey>
+        where TData : class
+        where TKey : IEquatable<TKey>
+#pragma warning restore CA1812
+    {
+        public Task CreateAsync(TKey key, TData data, IUserDataOperationMapper mapper)
         {
             throw new NotSupportedException();
         }

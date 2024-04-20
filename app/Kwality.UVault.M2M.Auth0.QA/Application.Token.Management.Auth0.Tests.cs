@@ -71,7 +71,7 @@ public sealed class ApplicationTokenManagementAuth0Tests
                     RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
 
-        this.tokenManager = new ApplicationTokenManagerFactory().Create<TokenModel, ApplicationModel, StringKey>(
+        this.tokenManager = new ApplicationTokenManagerFactory().Create<TokenModel>(
             options => options.UseAuth0Store<TokenModel, TokenModelMapper>(configuration,
                 static () => new Auth0Options
                 {

@@ -42,69 +42,79 @@ public static class UVaultOptionsExtensions
         where TModel : ApplicationModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        options.UseApplicationManagement<TModel, TKey>(null);
+        options.UseApplicationManagement<TModel, TKey>(ServiceLifetime.Scoped);
     }
 
     public static void UseApplicationManagement<TModel, TKey>(this UVaultOptions options, ServiceLifetime storeLifetime)
         where TModel : ApplicationModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        options.UseApplicationManagement<TModel, TKey>(null, storeLifetime);
+        ArgumentNullException.ThrowIfNull(options);
+        options.Services.AddScoped<ApplicationManager<TModel, TKey>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IApplicationStore<TModel, TKey>),
+            typeof(StaticStore<TModel, TKey>), storeLifetime));
     }
 
     public static void UseApplicationManagement<TModel, TKey>(
-        this UVaultOptions options, Action<ApplicationManagementOptions<TModel, TKey>>? applicationManagementOptions)
+        this UVaultOptions options, Action<ApplicationManagementOptions<TModel, TKey>> action)
         where TModel : ApplicationModel<TKey>
         where TKey : IEquatable<TKey>
     {
-        ArgumentNullException.ThrowIfNull(options);
-        UseAndConfigureApplicationManagement(options, applicationManagementOptions);
+        options.UseApplicationManagement(action, ServiceLifetime.Scoped);
     }
 
     public static void UseApplicationManagement<TModel, TKey>(
-        this UVaultOptions options, Action<ApplicationManagementOptions<TModel, TKey>>? applicationManagementOptions,
+        this UVaultOptions options, Action<ApplicationManagementOptions<TModel, TKey>> action,
         ServiceLifetime storeLifetime)
         where TModel : ApplicationModel<TKey>
         where TKey : IEquatable<TKey>
     {
         ArgumentNullException.ThrowIfNull(options);
-        UseAndConfigureApplicationManagement(options, applicationManagementOptions, storeLifetime);
-    }
-
-    public static void UseApplicationTokenManagement<TToken, TModel, TKey>(
-        this UVaultOptions options,
-        Action<ApplicationTokenManagementOptions<TToken>>? applicationTokenManagementOptions)
-        where TToken : TokenModel, new()
-        where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        ArgumentNullException.ThrowIfNull(options);
-        UseAndConfigureApplicationManagement<TModel, TKey>(options, null);
-        UseAndConfigureApplicationTokenManagement<TToken, TKey>(options, applicationTokenManagementOptions);
-    }
-
-    private static void UseAndConfigureApplicationManagement<TModel, TKey>(
-        UVaultOptions options, Action<ApplicationManagementOptions<TModel, TKey>>? applicationManagementOptions,
-        ServiceLifetime storeLifetime = ServiceLifetime.Scoped)
-        where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
+        ArgumentNullException.ThrowIfNull(action);
         options.Services.AddScoped<ApplicationManager<TModel, TKey>>();
 
         options.Services.Add(new ServiceDescriptor(typeof(IApplicationStore<TModel, TKey>),
             typeof(StaticStore<TModel, TKey>), storeLifetime));
 
-        options.Services.AddScoped<IApplicationStore<TModel, TKey>, StaticStore<TModel, TKey>>();
-        applicationManagementOptions?.Invoke(new ApplicationManagementOptions<TModel, TKey>(options.Services));
+        action.Invoke(new ApplicationManagementOptions<TModel, TKey>(options.Services));
     }
 
-    private static void UseAndConfigureApplicationTokenManagement<TToken, TKey>(
-        UVaultOptions options, Action<ApplicationTokenManagementOptions<TToken>>? applicationTokenManagementOptions)
+    public static void UseApplicationTokenManagement<TToken>(this UVaultOptions options)
         where TToken : TokenModel, new()
-        where TKey : IEquatable<TKey>
     {
+        options.UseApplicationTokenManagement<TToken>(ServiceLifetime.Scoped);
+    }
+
+    public static void UseApplicationTokenManagement<TToken>(this UVaultOptions options, ServiceLifetime storeLifetime)
+        where TToken : TokenModel, new()
+    {
+        ArgumentNullException.ThrowIfNull(options);
         options.Services.AddScoped<ApplicationTokenManager<TToken>>();
-        options.Services.AddScoped<IApplicationTokenStore<TToken>, StaticTokenStore<TToken>>();
-        applicationTokenManagementOptions?.Invoke(new ApplicationTokenManagementOptions<TToken>(options.Services));
+
+        options.Services.Add(new ServiceDescriptor(typeof(IApplicationTokenStore<TToken>),
+            typeof(StaticTokenStore<TToken>), storeLifetime));
+    }
+
+    public static void UseApplicationTokenManagement<TToken>(
+        this UVaultOptions options, Action<ApplicationTokenManagementOptions<TToken>> action)
+        where TToken : TokenModel, new()
+    {
+        options.UseApplicationTokenManagement(action, ServiceLifetime.Scoped);
+    }
+
+    public static void UseApplicationTokenManagement<TToken>(
+        this UVaultOptions options, Action<ApplicationTokenManagementOptions<TToken>> action,
+        ServiceLifetime storeLifetime)
+        where TToken : TokenModel, new()
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(action);
+        options.Services.AddScoped<ApplicationTokenManager<TToken>>();
+
+        options.Services.Add(new ServiceDescriptor(typeof(IApplicationTokenStore<TToken>),
+            typeof(StaticTokenStore<TToken>), storeLifetime));
+
+        action.Invoke(new ApplicationTokenManagementOptions<TToken>(options.Services));
     }
 }

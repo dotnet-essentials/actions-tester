@@ -36,26 +36,23 @@ internal sealed class ApplicationTokenManagerFactory
 {
     private readonly IServiceCollection serviceCollection = new ServiceCollection();
 
-    public ApplicationTokenManager<TToken> Create<TToken, TModel, TKey>()
+    public ApplicationTokenManager<TToken> Create<TToken>()
         where TToken : TokenModel, new()
-        where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>
     {
-        this.serviceCollection.AddUVault(static options =>
-            options.UseApplicationTokenManagement<TToken, TModel, TKey>(null));
+        this.serviceCollection.AddUVault(static options => options.UseApplicationTokenManagement<TToken>());
 
         return this.serviceCollection.BuildServiceProvider()
                    .GetRequiredService<ApplicationTokenManager<TToken>>();
     }
 
-    public ApplicationTokenManager<TToken> Create<TToken, TModel, TKey>(
+    public ApplicationTokenManager<TToken> Create<TToken>(
         Action<ApplicationTokenManagementOptions<TToken>>? applicationTokenManagementOptions)
         where TToken : TokenModel, new()
-        where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>
     {
+        ArgumentNullException.ThrowIfNull(applicationTokenManagementOptions);
+
         this.serviceCollection.AddUVault(options =>
-            options.UseApplicationTokenManagement<TToken, TModel, TKey>(applicationTokenManagementOptions));
+            options.UseApplicationTokenManagement(applicationTokenManagementOptions));
 
         return this.serviceCollection.BuildServiceProvider()
                    .GetRequiredService<ApplicationTokenManager<TToken>>();

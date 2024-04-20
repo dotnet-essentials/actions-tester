@@ -30,7 +30,6 @@ using AutoFixture.Xunit2;
 
 using FluentAssertions;
 
-using Kwality.UVault.Core.Keys;
 using Kwality.UVault.M2M.Managers;
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.QA.Internal.Factories;
@@ -42,7 +41,7 @@ using Xunit;
 public sealed class ApplicationTokenManagementDefaultTests
 {
     private readonly ApplicationTokenManager<TokenModel> manager
-        = new ApplicationTokenManagerFactory().Create<TokenModel, ApplicationModel<IntKey>, IntKey>();
+        = new ApplicationTokenManagerFactory().Create<TokenModel>();
 
     [AutoData]
     [M2MTokenManagement]

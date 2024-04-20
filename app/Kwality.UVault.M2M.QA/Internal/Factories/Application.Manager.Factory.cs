@@ -47,10 +47,11 @@ internal sealed class ApplicationManagerFactory
     }
 
     public ApplicationManager<TModel, TKey> Create<TModel, TKey>(
-        Action<ApplicationManagementOptions<TModel, TKey>>? action)
+        Action<ApplicationManagementOptions<TModel, TKey>> action)
         where TModel : ApplicationModel<TKey>
         where TKey : IEquatable<TKey>
     {
+        ArgumentNullException.ThrowIfNull(action);
         this.serviceCollection.AddUVault(options => options.UseApplicationManagement(action));
 
         return this.serviceCollection.BuildServiceProvider()

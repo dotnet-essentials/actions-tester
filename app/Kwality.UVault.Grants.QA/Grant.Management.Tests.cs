@@ -56,13 +56,94 @@ using Xunit;
 public sealed class GrantManagementTests
 {
     private const int pageSize = 100;
+
     private readonly GrantManager<Model, IntKey> manager
         = new GrantManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
 
     [AutoDomainData]
     [GrantManagement]
-    [Theory(DisplayName = "When a custom manager is configured, it's registered.")]
-    internal void UseManager_RegistersManager(IServiceCollection services)
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefault_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>());
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsSingleton_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(ServiceLifetime.Singleton));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(ServiceLifetime.Scoped));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When NO manager is provided, the services are added.")]
+    internal void UseDefaultAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(ServiceLifetime.Transient));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient);
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManager_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
@@ -73,25 +154,94 @@ public sealed class GrantManagementTests
         // ASSERT.
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped);
     }
 
     [AutoDomainData]
     [GrantManagement]
-    [Theory(DisplayName = "When a custom manager (with a custom store) is configured, it's registered.")]
-    internal void UseManagerWithStore_RegistersManager(IServiceCollection services)
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManagerAsSingleton_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options =>
+            options.UseGrantManagement<Model, IntKey>(
+                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Singleton));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton);
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManagerAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options =>
+            options.UseGrantManagement<Model, IntKey>(
+                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Scoped));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When a custom manager is configured, the services are added.")]
+    internal void UseCustomManagerAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options =>
+            options.UseGrantManagement<Model, IntKey>(
+                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Transient));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient);
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStore_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<ManagerStore<Model, IntKey>>();
             options.UseStore<Store<Model, IntKey>>();
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(ManagerStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped);
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
@@ -101,8 +251,97 @@ public sealed class GrantManagementTests
 
     [AutoDomainData]
     [GrantManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsSingleton_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
+        {
+            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Singleton);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
+                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsScoped_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
+        {
+            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Scoped);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When a custom store is configured, the services are added.")]
+    internal void UseCustomStoreAsTransient_AddsServices(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
+        {
+            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Transient);
+        }));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(GrantManager<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType ==
+                                                    typeof(GrantManager<Model, IntKey>));
+
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient &&
+                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
+    [Theory(DisplayName = "When NO manager configured, it can be resolved.")]
+    internal void ResolveDefaultManager_RaisesNoException(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>());
+
+        // ACT.
+        Func<GrantManager<Model, IntKey>> act = () => services.BuildServiceProvider()
+                                                              .GetRequiredService<GrantManager<Model, IntKey>>();
+
+        // ASSERT.
+        act.Should()
+           .NotThrow();
+    }
+
+    [AutoDomainData]
+    [GrantManagement]
     [Theory(DisplayName = "When a custom manager is configured, it can be resolved.")]
-    internal void ResolveManager_RaisesNoException(IServiceCollection services)
+    internal void ResolveCustomManager_RaisesNoException(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
@@ -122,7 +361,7 @@ public sealed class GrantManagementTests
     [AutoDomainData]
     [GrantManagement]
     [Theory(DisplayName = "When a custom manager is configured, it can be resolved.")]
-    internal void ResolveManagerWithStore_RaisesNoException(IServiceCollection services)
+    internal void ResolveCustomManagerWithStore_RaisesNoException(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
@@ -138,57 +377,6 @@ public sealed class GrantManagementTests
         // ASSERT.
         act.Should()
            .NotThrow();
-    }
-
-    [AutoDomainData]
-    [GrantManagement]
-    [Theory(DisplayName = "When the store is configured as a `Singleton` one, it behaves as such.")]
-    internal void UseStoreAsSingleton_RegisterStoreAsSingleton(IServiceCollection services)
-    {
-        // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseGrantManagement<Model, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Singleton)));
-
-        // ASSERT.
-        services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
-                                                    descriptor.ImplementationType == typeof(Store));
-    }
-
-    [AutoDomainData]
-    [GrantManagement]
-    [Theory(DisplayName = "When the store is configured as a `Scoped` one, it behaves as such.")]
-    internal void UseStoreAsScoped_RegisterStoreAsScoped(IServiceCollection services)
-    {
-        // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseGrantManagement<Model, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Scoped)));
-
-        // ASSERT.
-        services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store));
-    }
-
-    [AutoDomainData]
-    [GrantManagement]
-    [Theory(DisplayName = "When the store is configured as a `Transient` one, it behaves as such.")]
-    internal void UseStoreAsTransient_RegisterStoreAsTransient(IServiceCollection services)
-    {
-        // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseGrantManagement<Model, IntKey>(static options =>
-                options.UseStore<Store>(ServiceLifetime.Transient)));
-
-        // ASSERT.
-        services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Transient &&
-                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoData]
