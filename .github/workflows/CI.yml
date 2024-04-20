@@ -40,7 +40,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         dotnet: [ '6.0.419', '7.0.406', '8.0.201' ]
-        projects: [ 'app/Kwality.UVault.Core', 'app/Kwality.UVault.Core.Auth0', 'app/Kwality.UVault.Core.Auth0.QA', 'app/Kwality.UVault.APIs', 'app/Kwality.UVault.APIs.Auth0', 'app/Kwality.UVault.APIs.QA', 'app/Kwality.UVault.APIs.Auth0.QA', 'app/Kwality.UVault.IAM', 'app/Kwality.UVault.IAM.QA', 'app/Kwality.UVault.Grants', 'app/Kwality.UVault.Grants.Auth0', 'app/Kwality.UVault.Grants.QA', 'app/Kwality.UVault.Grants.Auth0.QA', 'app/Kwality.UVault.M2M', 'app/Kwality.UVault.M2M.Auth0', 'app/Kwality.UVault.M2M.QA', 'app/Kwality.UVault.M2M.Auth0.QA', 'app/Kwality.UVault.Users', 'app/Kwality.UVault.Users.Auth0', 'app/Kwality.UVault.Users.QA', 'app/Kwality.UVault.Users.Auth0.QA', 'app/Kwality.UVault.QA.Common' ]
+        projects: [ 'app/Kwality.UVault.Core', 'app/Kwality.UVault.Core.Auth0', 'app/Kwality.UVault.Core.Auth0.QA', 'app/Kwality.UVault.APIs', 'app/Kwality.UVault.APIs.Auth0', 'app/Kwality.UVault.APIs.QA', 'app/Kwality.UVault.APIs.Auth0.QA', 'app/Kwality.UVault.IAM', 'app/Kwality.UVault.IAM.QA', 'app/Kwality.UVault.Grants', 'app/Kwality.UVault.Grants.Auth0', 'app/Kwality.UVault.Grants.QA', 'app/Kwality.UVault.Grants.Auth0.QA', 'app/Kwality.UVault.M2M', 'app/Kwality.UVault.M2M.Auth0', 'app/Kwality.UVault.M2M.QA', 'app/Kwality.UVault.M2M.Auth0.QA', 'app/Kwality.UVault.Users', 'app/Kwality.UVault.Users.Auth0', 'app/Kwality.UVault.Users.QA', 'app/Kwality.UVault.Users.Auth0.QA', 'app/Kwality.UVault.E2E', 'app/Kwality.UVault.QA.Common' ]
 
     steps:
       - name: GIT Clone

@@ -33,7 +33,3 @@ insert_final_newline = true
 # Configuration for C# files.
 [*.cs]
 dotnet_analyzer_diagnostic.severity = warning
-dotnet_diagnostic.S101.severity = none
-dotnet_diagnostic.S1144.severity = none
-dotnet_diagnostic.S1309.severity = none
-dotnet_diagnostic.S2094.severity = none

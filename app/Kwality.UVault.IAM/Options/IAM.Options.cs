@@ -35,7 +35,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 [PublicAPI]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+#pragma warning disable S101
 public sealed class IAMOptions
+#pragma warning restore S101
 {
     internal IAMOptions(AuthenticationBuilder authenticationBuilder)
     {

@@ -443,20 +443,10 @@ public sealed class GrantManagementTests
         where TKey : IEquatable<TKey>;
 
 #pragma warning disable CA1812
-    private sealed class ManagerStore<TModel, TKey> : GrantManager<TModel, TKey>
+    private sealed class ManagerStore<TModel, TKey>(IGrantStore<TModel, TKey> store) : GrantManager<TModel, TKey>(store)
 #pragma warning restore CA1812
         where TModel : GrantModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        public ManagerStore(IGrantStore<TModel, TKey> store)
-            : base(store)
-        {
-            if (store is not Store<TModel, TKey>)
-            {
-                throw new InvalidOperationException("The provided store isn't valid for this manager.");
-            }
-        }
-    }
+        where TKey : IEquatable<TKey>;
 
     [UsedImplicitly]
 #pragma warning disable CA1812

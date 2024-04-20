@@ -513,20 +513,11 @@ public sealed class ApplicationManagementTests
         where TKey : IEquatable<TKey>;
 
 #pragma warning disable CA1812
-    private sealed class ManagerStore<TModel, TKey> : ApplicationManager<TModel, TKey>
+    private sealed class ManagerStore<TModel, TKey>(IApplicationStore<TModel, TKey> store)
+        : ApplicationManager<TModel, TKey>(store)
 #pragma warning restore CA1812
         where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        public ManagerStore(IApplicationStore<TModel, TKey> store)
-            : base(store)
-        {
-            if (store is not Store<TModel, TKey>)
-            {
-                throw new InvalidOperationException("The provided store isn't valid for this manager.");
-            }
-        }
-    }
+        where TKey : IEquatable<TKey>;
 
 #pragma warning disable CA1812
     internal sealed class Model : ApplicationModel<IntKey>

@@ -316,21 +316,13 @@ public sealed class UserManagementDataTests
         where TData : class;
 
 #pragma warning disable CA1812
-    private sealed class ManagerStore<TModel, TKey, TData> : UserManager<TModel, TKey, TData>
+    private sealed class ManagerStore<TModel, TKey, TData>(
+        IUserStore<TModel, TKey> store,
+        IUserDataStore<TData, TKey> dataStore) : UserManager<TModel, TKey, TData>(store, dataStore)
 #pragma warning restore CA1812
         where TModel : UserModel<TKey>
         where TKey : IEquatable<TKey>
-        where TData : class
-    {
-        public ManagerStore(IUserStore<TModel, TKey> store, IUserDataStore<TData, TKey> dataStore)
-            : base(store, dataStore)
-        {
-            if (store is not Store<TModel, TKey>)
-            {
-                throw new InvalidOperationException("The provided store isn't valid for this manager.");
-            }
-        }
-    }
+        where TData : class;
 
     [UsedImplicitly]
     internal sealed class Model(IntKey key, string email) : UserModel<IntKey>(key, email);

@@ -35,7 +35,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 [PublicAPI]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+#pragma warning disable S101
 public static class IAMOptionsExtensions
+#pragma warning restore S101
 {
     public static void UseDefault(this IAMOptions options, string validIssuer, string validAudience)
     {
