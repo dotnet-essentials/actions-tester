@@ -336,7 +336,9 @@ public sealed class UserManagementDataTests
     internal sealed class Model(IntKey key, string email) : UserModel<IntKey>(key, email);
 
     [UsedImplicitly]
+#pragma warning disable CA1812
     internal sealed class Data;
+#pragma warning restore CA1812
 
     [UsedImplicitly]
 #pragma warning disable CA1812

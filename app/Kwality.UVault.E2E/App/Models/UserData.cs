@@ -24,7 +24,7 @@
 // =====================================================================================================================
 namespace Kwality.UVault.E2E.App.Models;
 
-internal sealed class UserData
+internal sealed class UserData(string email)
 {
-    public string Email { get; set; }
+    public string Email { get; init; } = email;
 }

@@ -84,7 +84,7 @@ internal static class E2EApplicationBuilder
         HttpContext context, UserManager<UserModel, StringKey, UserData> userManager, UserCreateModel model)
     {
         var userModel = new UserModel(new StringKey(model.Email), model.FirstName, model.LastName, model.Password);
-        var userData = new UserData { Email = model.Email };
+        var userData = new UserData(model.Email);
 
         await userManager.CreateAsync(userModel, userData, new UserCreateOperationMapper(),
                              new UserDataCreateOperationMapper())

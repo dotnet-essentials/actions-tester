@@ -33,6 +33,6 @@ public sealed class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public string ExternalId { get; set; }
-    public string UserEmail { get; set; }
+    public required string ExternalId { get; set; }
+    public required string UserEmail { get; set; }
 }
