@@ -385,7 +385,6 @@ public sealed class GrantManagementAuth0Tests
         public string Audience { get; } = Environment.AUTH0_AUDIENCE;
     }
 
-    
 #pragma warning disable CA1812
     private sealed class ModelMapper : IModelMapper<Model>
 #pragma warning restore CA1812

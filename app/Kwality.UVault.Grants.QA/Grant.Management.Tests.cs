@@ -634,7 +634,6 @@ public sealed class GrantManagementTests
         where TModel : GrantModel<TKey>
         where TKey : IEquatable<TKey>;
 
-    
 #pragma warning disable CA1812
     internal sealed class Model(IntKey key, IEnumerable<string> scopes) : GrantModel<IntKey>(key)
 #pragma warning restore CA1812
@@ -694,7 +693,6 @@ public sealed class GrantManagementTests
         }
     }
 
-    
 #pragma warning disable CA1812
     internal sealed class Store : IGrantStore<Model, IntKey>
 #pragma warning restore CA1812

@@ -44,9 +44,8 @@ using Xunit;
 
 public sealed class ApplicationTokenManagementTests
 {
-    private readonly ApplicationTokenManager<Model> manager = new ApplicationTokenManagerFactory().Create<Model>(
-        static options =>
-            options.UseStore<Store>());
+    private readonly ApplicationTokenManager<Model> manager
+        = new ApplicationTokenManagerFactory().Create<Model>(static options => options.UseStore<Store>());
 
     [AutoDomainData]
     [M2MTokenManagement]
@@ -296,7 +295,6 @@ public sealed class ApplicationTokenManagementTests
         }
     }
 
-    
 #pragma warning disable CA1812
     internal sealed class Store : IApplicationTokenStore<Model>
 #pragma warning restore CA1812

@@ -69,8 +69,8 @@ public sealed class ApplicationTokenManagementAuth0Tests
                     RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
 
-        this.tokenManager = new ApplicationTokenManagerFactory().Create<TokenModel>(
-            options => options.UseAuth0Store<TokenModel, TokenModelMapper>(configuration,
+        this.tokenManager = new ApplicationTokenManagerFactory().Create<TokenModel>(options =>
+            options.UseAuth0Store<TokenModel, TokenModelMapper>(configuration,
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
@@ -170,7 +170,6 @@ public sealed class ApplicationTokenManagementAuth0Tests
         }
     }
 
-    
 #pragma warning disable CA1812
     private sealed class ModelMapper : IModelMapper<Model>
 #pragma warning restore CA1812
@@ -184,7 +183,6 @@ public sealed class ApplicationTokenManagementAuth0Tests
         }
     }
 
-    
     internal sealed class TokenModel : M2M.Models.TokenModel
     {
         public TokenModel()
@@ -200,7 +198,6 @@ public sealed class ApplicationTokenManagementAuth0Tests
         }
     }
 
-    
 #pragma warning disable CA1812
     private sealed class TokenModelMapper : IModelTokenMapper<TokenModel>
 #pragma warning restore CA1812

@@ -293,7 +293,6 @@ public sealed class GrantManagementDefaultIntKeyTests
         }
     }
 
-    
 #pragma warning disable CA1812
     internal sealed class Model(IntKey key) : GrantModel<IntKey>(key)
 #pragma warning restore CA1812

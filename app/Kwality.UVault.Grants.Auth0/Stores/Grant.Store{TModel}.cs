@@ -44,7 +44,6 @@ using Kwality.UVault.Grants.Operations.Filters.Abstractions;
 using Kwality.UVault.Grants.Operations.Mappers.Abstractions;
 using Kwality.UVault.Grants.Stores.Abstractions;
 
-
 #pragma warning disable CA1812
 internal sealed class GrantStore<TModel>(
 #pragma warning restore CA1812

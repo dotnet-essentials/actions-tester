@@ -55,7 +55,7 @@ internal sealed class ApplicationStore<TModel>(
 {
     private const string readError = "Failed to read applications.";
     private const string createError = "Failed to create application.";
-    
+
     public Task<PagedResultSet<TModel>> GetAllAsync(int pageIndex, int pageSize, IApplicationFilter? filter)
     {
         options.RetryCount = 0;

@@ -44,6 +44,7 @@ using Xunit;
 public sealed class ApplicationManagementDefaultStringKeyTests
 {
     private const int pageSize = 100;
+
     private readonly ApplicationManager<Model, StringKey> manager
         = new ApplicationManagerFactory().Create<Model, StringKey>();
 
@@ -353,7 +354,6 @@ public sealed class ApplicationManagementDefaultStringKeyTests
         }
     }
 
-    
 #pragma warning disable CA1812
     internal sealed class Model : ApplicationModel<StringKey>
 #pragma warning restore CA1812
