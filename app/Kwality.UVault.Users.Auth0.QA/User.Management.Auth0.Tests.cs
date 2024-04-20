@@ -58,6 +58,7 @@ using AuthenticationFailureException = Kwality.UVault.Users.Auth0.QA.Internal.Ex
 [Collection("Auth0")]
 public sealed class UserManagementAuth0Tests
 {
+    private const int rateLimitMaxRetryCount = 5;
     private readonly UserManager<Model, StringKey> userManager;
 
     public UserManagementAuth0Tests()
@@ -70,7 +71,7 @@ public sealed class UserManagementAuth0Tests
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
                     RateLimitRetryInterval = TimeSpan.FromSeconds(2),
-                    RateLimitMaxRetryCount = 5,
+                    RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }
 

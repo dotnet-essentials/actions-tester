@@ -56,6 +56,7 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class ApiManagementAuth0Tests
 {
+    private const int rateLimitMaxRetryCount = 5;
     private readonly ApiManager<Model, StringKey> apiManager;
 
     public ApiManagementAuth0Tests()
@@ -68,7 +69,7 @@ public sealed class ApiManagementAuth0Tests
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
                     RateLimitRetryInterval = TimeSpan.FromSeconds(2),
-                    RateLimitMaxRetryCount = 5,
+                    RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }
 

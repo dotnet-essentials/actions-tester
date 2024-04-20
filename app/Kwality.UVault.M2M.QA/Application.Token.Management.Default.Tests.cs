@@ -41,18 +41,17 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class ApplicationTokenManagementDefaultTests
 {
+    private readonly ApplicationTokenManager<TokenModel> manager
+        = new ApplicationTokenManagerFactory().Create<TokenModel, ApplicationModel<IntKey>, IntKey>();
+
     [AutoData]
     [M2MTokenManagement]
     [Theory(DisplayName = "Get access token succeeds.")]
     internal async Task GetToken_Succeeds(string clientId, string clientSecret, string audience, string grantType)
     {
-        // ARRANGE.
-        ApplicationTokenManager<TokenModel> manager
-            = new ApplicationTokenManagerFactory().Create<TokenModel, ApplicationModel<IntKey>, IntKey>();
-
         // ACT.
-        TokenModel result = await manager.GetAccessTokenAsync(clientId, clientSecret, audience, grantType)
-                                         .ConfigureAwait(true);
+        TokenModel result = await this.manager.GetAccessTokenAsync(clientId, clientSecret, audience, grantType)
+                                      .ConfigureAwait(true);
 
         // ASSERT.
         result.Token.Should()

@@ -39,16 +39,15 @@ using Xunit;
 
 public sealed class ApplicationCreateOperationMapperTests
 {
+    private readonly CreateOperationMapper mapper = new();
+
     [M2MManagement]
     [AutoData]
     [Theory(DisplayName = "Map to an invalid destination raises an exception.")]
     internal void Map_InvalidDestination_RaisesException(ModelOne model)
     {
-        // ARRANGE.
-        var mapper = new CreateOperationMapper();
-
         // ACT.
-        Action act = () => mapper.Create<ModelOne, ModelTwo>(model);
+        Action act = () => this.mapper.Create<ModelOne, ModelTwo>(model);
 
         // ASSERT.
         act.Should()
@@ -61,11 +60,8 @@ public sealed class ApplicationCreateOperationMapperTests
     [Theory(DisplayName = "Map succeeds.")]
     internal void Map_Succeeds(ModelOne model)
     {
-        // ARRANGE.
-        var mapper = new CreateOperationMapper();
-
         // ACT.
-        ModelOne result = mapper.Create<ModelOne, ModelOne>(model);
+        ModelOne result = this.mapper.Create<ModelOne, ModelOne>(model);
 
         // ASSERT.
         result.Should()

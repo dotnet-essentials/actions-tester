@@ -24,6 +24,8 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Auth0.Stores;
 
+using System.Diagnostics.CodeAnalysis;
+
 using global::Auth0.Core.Exceptions;
 using global::Auth0.ManagementApi;
 using global::Auth0.ManagementApi.Models;
@@ -116,32 +118,40 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException("Failed to read applications.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException("Failed to read applications.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.GetAllInternalAsync(pageIndex, pageSize, filter)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException("Failed to read applications.", ex);
-            }
+            return await this.HandleGetAllInternalRateLimitExceptionAsync(pageIndex, pageSize, filter, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new ReadException("Failed to read applications.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<PagedResultSet<TModel>> HandleGetAllInternalRateLimitExceptionAsync(
+        int pageIndex, int pageSize, IApplicationFilter? filter, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException("Failed to read applications.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException("Failed to read applications.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.GetAllInternalAsync(pageIndex, pageSize, filter)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException("Failed to read applications.", ex);
         }
     }
 
@@ -159,32 +169,39 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to read application: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to read application: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.GetByKeyInternalAsync(key)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException($"Failed to read application: `{key}`.", ex);
-            }
+            return await this.HandleGetByKeyInternalRateLimitExceptionAsync(key, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new ReadException($"Failed to read application: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<TModel> HandleGetByKeyInternalRateLimitExceptionAsync(StringKey key, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to read application: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to read application: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.GetByKeyInternalAsync(key)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException($"Failed to read application: `{key}`.", ex);
         }
     }
 
@@ -202,32 +219,40 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException("Failed to create application.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException("Failed to create application.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.CreateInternalAsync(model, mapper)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException("Failed to create application.", ex);
-            }
+            return await this.HandleCreateInternalRateLimitExceptionAsync(model, mapper, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new CreateException("Failed to create application.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<StringKey> HandleCreateInternalRateLimitExceptionAsync(
+        TModel model, IApplicationOperationMapper mapper, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException("Failed to create application.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException("Failed to create application.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.CreateInternalAsync(model, mapper)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException("Failed to create application.", ex);
         }
     }
 
@@ -243,34 +268,42 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to update application: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to update application: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    await this.UpdateInternalAsync(key, model, mapper)
-                              .ConfigureAwait(false);
-
-                    break;
-
-                default:
-                    throw new ReadException($"Failed to update application: `{key}`.", ex);
-            }
+            await this.HandleUpdateInternalRateLimitExceptionAsync(key, model, mapper, ex)
+                      .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new UpdateException($"Failed to update application: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task HandleUpdateInternalRateLimitExceptionAsync(
+        StringKey key, TModel model, IApplicationOperationMapper mapper, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to update application: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to update application: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                await this.UpdateInternalAsync(key, model, mapper)
+                          .ConfigureAwait(false);
+
+                break;
+
+            default:
+                throw new ReadException($"Failed to update application: `{key}`.", ex);
         }
     }
 
@@ -286,34 +319,41 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to delete application: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to delete application: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    await this.DeleteByKeyInternalAsync(key)
-                              .ConfigureAwait(false);
-
-                    break;
-
-                default:
-                    throw new ReadException($"Failed to delete application: `{key}`.", ex);
-            }
+            await this.HandleDeleteByKeyInternalRateLimitExceptionAsync(key, ex)
+                      .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new UpdateException($"Failed to delete application: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task HandleDeleteByKeyInternalRateLimitExceptionAsync(StringKey key, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to delete application: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to delete application: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                await this.DeleteByKeyInternalAsync(key)
+                          .ConfigureAwait(false);
+
+                break;
+
+            default:
+                throw new ReadException($"Failed to delete application: `{key}`.", ex);
         }
     }
 
@@ -331,32 +371,39 @@ internal sealed class ApplicationStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to update application: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to update application: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.RotateClientSecretInternalAsync(key)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException($"Failed to update application: `{key}`.", ex);
-            }
+            return await this.HandleRotateClientSecretInternalRateLimitExceptionAsync(key, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new UpdateException($"Failed to update application: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<TModel> HandleRotateClientSecretInternalRateLimitExceptionAsync(StringKey key, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to update application: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to update application: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.RotateClientSecretInternalAsync(key)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException($"Failed to update application: `{key}`.", ex);
         }
     }
 

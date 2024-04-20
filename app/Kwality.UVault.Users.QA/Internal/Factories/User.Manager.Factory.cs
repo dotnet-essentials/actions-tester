@@ -22,7 +22,7 @@
 // =                FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // =                OTHER DEALINGS IN THE SOFTWARE.
 // =====================================================================================================================
-namespace Kwality.UVault.Users.QA.Factories;
+namespace Kwality.UVault.Users.QA.Internal.Factories;
 
 using Kwality.UVault.Core.Extensions;
 using Kwality.UVault.Users.Extensions;

@@ -52,32 +52,32 @@ using Xunit;
 [Collection("Auth0")]
 public sealed class ApplicationTokenManagementAuth0Tests
 {
-    private readonly ApplicationManager<Model, StringKey> applicationManager;
-    private readonly ApplicationTokenManager<TokenModel> applicationTokenManager;
+    private const int rateLimitMaxRetryCount = 5;
+    private readonly ApplicationManager<Model, StringKey> manager;
+    private readonly ApplicationTokenManager<TokenModel> tokenManager;
 
     public ApplicationTokenManagementAuth0Tests()
     {
         ApiConfiguration apiConfiguration = GetApiConfiguration();
         M2MConfiguration configuration = GetM2MConfiguration();
 
-        this.applicationManager = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
+        this.manager = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
             options.UseAuth0Store<Model, ModelMapper>(apiConfiguration,
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
                     RateLimitRetryInterval = TimeSpan.FromSeconds(2),
-                    RateLimitMaxRetryCount = 5,
+                    RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
 
-        this.applicationTokenManager
-            = new ApplicationTokenManagerFactory().Create<TokenModel, ApplicationModel, StringKey>(options =>
-                options.UseAuth0Store<TokenModel, TokenModelMapper>(configuration,
-                    static () => new Auth0Options
-                    {
-                        RateLimitBehaviour = RateLimitBehaviour.Retry,
-                        RateLimitRetryInterval = TimeSpan.FromSeconds(2),
-                        RateLimitMaxRetryCount = 5,
-                    }));
+        this.tokenManager = new ApplicationTokenManagerFactory().Create<TokenModel, ApplicationModel, StringKey>(
+            options => options.UseAuth0Store<TokenModel, TokenModelMapper>(configuration,
+                static () => new Auth0Options
+                {
+                    RateLimitBehaviour = RateLimitBehaviour.Retry,
+                    RateLimitRetryInterval = TimeSpan.FromSeconds(2),
+                    RateLimitMaxRetryCount = rateLimitMaxRetryCount,
+                }));
     }
 
     [M2MTokenManagement]
@@ -85,12 +85,11 @@ public sealed class ApplicationTokenManagementAuth0Tests
     internal async Task GetToken_ApplicationWithPermission_Succeeds()
     {
         // ARRANGE.
-        Model application = await this.applicationManager.GetByKeyAsync(new StringKey(Environment.AUTH0_CLIENT_ID))
+        Model application = await this.manager.GetByKeyAsync(new StringKey(Environment.AUTH0_CLIENT_ID))
                                       .ConfigureAwait(true);
 
         // ACT.
-        TokenModel result = await this.applicationTokenManager
-                                      .GetAccessTokenAsync(application.Key.ToString() ?? string.Empty,
+        TokenModel result = await this.tokenManager.GetAccessTokenAsync(application.Key.ToString() ?? string.Empty,
                                           application.ClientSecret ?? string.Empty, Environment.AUTH0_AUDIENCE,
                                           "client_credentials")
                                       .ConfigureAwait(true);
@@ -114,14 +113,14 @@ public sealed class ApplicationTokenManagementAuth0Tests
     internal async Task GetToken_ApplicationWithoutPermission_Fails()
     {
         // ARRANGE.
-        Model application = await this.applicationManager
-                                      .GetByKeyAsync(new StringKey(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
-                                      .ConfigureAwait(true);
+        Model application = await this
+                                  .manager.GetByKeyAsync(new StringKey(Environment.AUTH0_TEST_APPLICATION_1_CLIENT_ID))
+                                  .ConfigureAwait(true);
 
         // ACT.
-        Func<Task<TokenModel>> act = () => this.applicationTokenManager.GetAccessTokenAsync(
-            application.Key.ToString() ?? string.Empty,
-                application.ClientSecret ?? string.Empty, Environment.AUTH0_AUDIENCE, "client_credentials");
+        Func<Task<TokenModel>> act = () => this.tokenManager.GetAccessTokenAsync(
+            application.Key.ToString() ?? string.Empty, application.ClientSecret ?? string.Empty,
+            Environment.AUTH0_AUDIENCE, "client_credentials");
 
         // ASSERT.
         await act.Should()
@@ -142,7 +141,7 @@ public sealed class ApplicationTokenManagementAuth0Tests
     {
         // ACT.
         Func<Task<TokenModel>> act = () =>
-            this.applicationTokenManager.GetAccessTokenAsync(clientId, clientSecret, audience, grantType);
+            this.tokenManager.GetAccessTokenAsync(clientId, clientSecret, audience, grantType);
 
         // ASSERT.
         await act.Should()

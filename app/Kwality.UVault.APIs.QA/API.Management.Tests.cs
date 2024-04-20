@@ -73,7 +73,7 @@ public sealed class ApiManagementTests
     [AutoDomainData]
     [ApiManagement]
     [Theory(DisplayName = "When a custom manager (with a custom store) is configured, it's registered.")]
-    internal void UseManagerStore_RegistersManager(IServiceCollection services)
+    internal void UseManagerWithStore_RegistersManager(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
@@ -116,7 +116,7 @@ public sealed class ApiManagementTests
     [AutoDomainData]
     [ApiManagement]
     [Theory(DisplayName = "When a custom manager is configured, it can be resolved.")]
-    internal void ResolveManagerStore_RaisesNoException(IServiceCollection services)
+    internal void ResolveManagerWithStore_RaisesNoException(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>

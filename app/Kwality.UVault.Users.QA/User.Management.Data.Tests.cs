@@ -34,7 +34,6 @@ using JetBrains.Annotations;
 
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Extensions;
-using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.QA.Common.Xunit.Traits;
 using Kwality.UVault.Users.Extensions;
@@ -166,29 +165,6 @@ public sealed class UserManagementDataTests
 
     [AutoDomainData]
     [UserManagement]
-    [Theory(DisplayName = "When a custom manager is configured, it can be resolved.")]
-    internal void ResolveManagerDataStore_RaisesNoException(IServiceCollection services)
-    {
-        // ARRANGE.
-        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Data>(static options =>
-        {
-            options.UseManager<ManagerStore<Model, IntKey, Data>, Data>();
-            options.UseStore<Store<Model, IntKey>>();
-            options.UseDataStore<DataStore<Data, IntKey>, Data>();
-        }));
-
-        // ACT.
-        Func<ManagerStore<Model, IntKey, Data>> act = () => services.BuildServiceProvider()
-                                                                    .GetRequiredService<
-                                                                        ManagerStore<Model, IntKey, Data>>();
-
-        // ASSERT.
-        act.Should()
-           .NotThrow();
-    }
-
-    [AutoDomainData]
-    [UserManagement]
     [Theory(DisplayName = "When the store is configured as a `Singleton` one, it behaves as such.")]
     internal void UseStoreAsSingleton_RegisterStoreAsSingleton(IServiceCollection services)
     {
@@ -236,6 +212,54 @@ public sealed class UserManagementDataTests
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Transient &&
                                                     descriptor.ImplementationType == typeof(Store));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When the data store is configured as a `Singleton` one, it behaves as such.")]
+    internal void UseDataStoreAsSingleton_RegisterStoreAsSingleton(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Data>(static options =>
+            options.UseDataStore<DataStore<Data, IntKey>, Data>(ServiceLifetime.Singleton)));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Data, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Singleton &&
+                                                    descriptor.ImplementationType == typeof(DataStore<Data, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When the data store is configured as a `Scoped` one, it behaves as such.")]
+    internal void UseDataStoreAsScoped_RegisterStoreAsScoped(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Data>(static options =>
+            options.UseDataStore<DataStore<Data, IntKey>, Data>(ServiceLifetime.Scoped)));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Data, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                                                    descriptor.ImplementationType == typeof(DataStore<Data, IntKey>));
+    }
+
+    [AutoDomainData]
+    [UserManagement]
+    [Theory(DisplayName = "When the data store is configured as a `Transient` one, it behaves as such.")]
+    internal void UseDataStoreAsTransient_RegisterStoreAsTransient(IServiceCollection services)
+    {
+        // ARRANGE.
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Data>(static options =>
+            options.UseDataStore<DataStore<Data, IntKey>, Data>(ServiceLifetime.Transient)));
+
+        // ASSERT.
+        services.Should()
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Data, IntKey>) &&
+                                                    descriptor.Lifetime == ServiceLifetime.Transient &&
+                                                    descriptor.ImplementationType == typeof(DataStore<Data, IntKey>));
     }
 
 #pragma warning disable CA1812
@@ -313,36 +337,6 @@ public sealed class UserManagementDataTests
 
     [UsedImplicitly]
     internal sealed class Data;
-
-    private sealed class CreateOperationMapper : IUserOperationMapper
-    {
-        public TDestination Create<TSource, TDestination>(TSource source)
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(TSource))
-            {
-                throw new CreateException(
-                    $"Invalid {nameof(IUserOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
-            }
-
-            return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
-
-    private sealed class UpdateOperationMapper : IUserOperationMapper
-    {
-        public TDestination Create<TSource, TDestination>(TSource source)
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(TSource))
-            {
-                throw new UpdateException(
-                    $"Invalid {nameof(IUserOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
-            }
-
-            return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
 
     [UsedImplicitly]
 #pragma warning disable CA1812

@@ -52,6 +52,9 @@ using Xunit;
 
 public sealed class ApplicationManagementTests
 {
+    private readonly ApplicationManager<Model, IntKey> manager
+        = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
+
     [AutoDomainData]
     [M2MManagement]
     [Theory(DisplayName = "When a custom manager is configured, it's registered.")]
@@ -72,7 +75,7 @@ public sealed class ApplicationManagementTests
     [AutoDomainData]
     [M2MManagement]
     [Theory(DisplayName = "When a custom manager (with a custom store) is configured, it's registered.")]
-    internal void UseManagerStore_RegistersManager(IServiceCollection services)
+    internal void UseManagerWithStore_RegistersManager(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
@@ -116,7 +119,7 @@ public sealed class ApplicationManagementTests
     [AutoDomainData]
     [M2MManagement]
     [Theory(DisplayName = "When a custom manager is configured, it can be resolved.")]
-    internal void ResolveManagerStore_RaisesNoException(IServiceCollection services)
+    internal void ResolveManagerWithStore_RaisesNoException(IServiceCollection services)
     {
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
@@ -191,15 +194,12 @@ public sealed class ApplicationManagementTests
     internal async Task GetAll_FirstPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
-        await manager.CreateAsync(model, new CreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(model, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(0, 10)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(0, 10)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -222,15 +222,12 @@ public sealed class ApplicationManagementTests
     internal async Task GetAll_SecondPageWhenAllDataShowed_Succeeds(Model model)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
-        await manager.CreateAsync(model, new CreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(model, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(1, 10)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(1, 10)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -247,18 +244,15 @@ public sealed class ApplicationManagementTests
     internal async Task GetAll_FirstPageWhenNotAllDataShowed_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
+        await this.manager.CreateAsync(modelOne, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelOne, new CreateOperationMapper())
-                     .ConfigureAwait(true);
-
-        await manager.CreateAsync(modelTwo, new CreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(modelTwo, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(0, 1)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(0, 1)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -281,18 +275,15 @@ public sealed class ApplicationManagementTests
     internal async Task GetAll_SecondPageWithLessElementsThanTotal_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
+        await this.manager.CreateAsync(modelOne, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelOne, new CreateOperationMapper())
-                     .ConfigureAwait(true);
-
-        await manager.CreateAsync(modelTwo, new CreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(modelTwo, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ACT.
-        PagedResultSet<Model> result = await manager.GetAllAsync(1, 1)
-                                                    .ConfigureAwait(true);
+        PagedResultSet<Model> result = await this.manager.GetAllAsync(1, 1)
+                                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.HasNextPage.Should()
@@ -315,17 +306,15 @@ public sealed class ApplicationManagementTests
     internal async Task GetAll_WithFilter_Succeeds(Model modelOne, Model modelTwo)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
+        await this.manager.CreateAsync(modelOne, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelOne, new CreateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.CreateAsync(modelTwo, new CreateOperationMapper())
+                  .ConfigureAwait(true);
 
-        await manager.CreateAsync(modelTwo, new CreateOperationMapper())
-                     .ConfigureAwait(true);
-
-        PagedResultSet<Model> result = await manager
-                                             .GetAllAsync(0, 10, new OperationFilter(modelTwo.Name ?? string.Empty))
+        PagedResultSet<Model> result = await this
+                                             .manager.GetAllAsync(0, 10,
+                                                 new OperationFilter(modelTwo.Name ?? string.Empty))
                                              .ConfigureAwait(true);
 
         // ASSERT.
@@ -344,12 +333,8 @@ public sealed class ApplicationManagementTests
     [Theory(DisplayName = "Get by key raises an exception when the key is NOT found.")]
     internal async Task GetByKey_UnknownKey_RaisesException(IntKey key)
     {
-        // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
         // ACT.
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.manager.GetByKeyAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -363,18 +348,14 @@ public sealed class ApplicationManagementTests
     [Theory(DisplayName = "Create succeeds.")]
     internal async Task Create_Succeeds(Model model)
     {
-        // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
         // ACT.
-        IntKey key = await manager.CreateAsync(model, new CreateOperationMapper())
-                                  .ConfigureAwait(true);
+        IntKey key = await this.manager.CreateAsync(model, new CreateOperationMapper())
+                               .ConfigureAwait(true);
 
         // ASSERT.
-        (await manager.GetByKeyAsync(key)
-                      .ConfigureAwait(true)).Should()
-                                            .BeEquivalentTo(model);
+        (await this.manager.GetByKeyAsync(key)
+                   .ConfigureAwait(true)).Should()
+                                         .BeEquivalentTo(model);
     }
 
     [AutoData]
@@ -383,22 +364,19 @@ public sealed class ApplicationManagementTests
     internal async Task Update_Succeeds(Model model)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
-        IntKey key = await manager.CreateAsync(model, new CreateOperationMapper())
-                                  .ConfigureAwait(true);
+        IntKey key = await this.manager.CreateAsync(model, new CreateOperationMapper())
+                               .ConfigureAwait(true);
 
         // ACT.
         model.Name = "UVault (Sample application)";
 
-        await manager.UpdateAsync(key, model, new UpdateOperationMapper())
-                     .ConfigureAwait(true);
+        await this.manager.UpdateAsync(key, model, new UpdateOperationMapper())
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        (await manager.GetByKeyAsync(key)
-                      .ConfigureAwait(true)).Should()
-                                            .BeEquivalentTo(model);
+        (await this.manager.GetByKeyAsync(key)
+                   .ConfigureAwait(true)).Should()
+                                         .BeEquivalentTo(model);
     }
 
     [AutoData]
@@ -406,12 +384,8 @@ public sealed class ApplicationManagementTests
     [Theory(DisplayName = "Update raises an exception when the key is not found.")]
     internal async Task Update_UnknownKey_RaisesException(IntKey key, Model model)
     {
-        // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
         // ACT.
-        Func<Task> act = () => manager.UpdateAsync(key, model, new UpdateOperationMapper());
+        Func<Task> act = () => this.manager.UpdateAsync(key, model, new UpdateOperationMapper());
 
         // ASSERT.
         await act.Should()
@@ -426,18 +400,15 @@ public sealed class ApplicationManagementTests
     internal async Task Delete_Succeeds(Model model)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
-        IntKey key = await manager.CreateAsync(model, new CreateOperationMapper())
-                                  .ConfigureAwait(true);
+        IntKey key = await this.manager.CreateAsync(model, new CreateOperationMapper())
+                               .ConfigureAwait(true);
 
         // ACT.
-        await manager.DeleteByKeyAsync(key)
-                     .ConfigureAwait(true);
+        await this.manager.DeleteByKeyAsync(key)
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        Func<Task<Model>> act = () => manager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.manager.GetByKeyAsync(key);
 
         await act.Should()
                  .ThrowAsync<ReadException>()
@@ -450,12 +421,8 @@ public sealed class ApplicationManagementTests
     [Theory(DisplayName = "Delete succeeds when the key is not found.")]
     internal async Task Delete_UnknownKey_Succeeds(IntKey key)
     {
-        // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
         // ACT.
-        Func<Task> act = () => manager.DeleteByKeyAsync(key);
+        Func<Task> act = () => this.manager.DeleteByKeyAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -468,12 +435,8 @@ public sealed class ApplicationManagementTests
     [Theory(DisplayName = "Rotate client secret raises an exception when the key is NOT found.")]
     internal async Task RotateClientSecret_UnknownKey_RaisesException(IntKey key)
     {
-        // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
         // ACT.
-        Func<Task<Model>> act = () => manager.RotateClientSecretAsync(key);
+        Func<Task<Model>> act = () => this.manager.RotateClientSecretAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -488,21 +451,18 @@ public sealed class ApplicationManagementTests
     internal async Task RotateClientSecret_Succeeds(Model model)
     {
         // ARRANGE.
-        ApplicationManager<Model, IntKey> manager
-            = new ApplicationManagerFactory().Create<Model, IntKey>(static options => options.UseStore<Store>());
-
-        IntKey key = await manager.CreateAsync(model, new CreateOperationMapper())
-                                  .ConfigureAwait(true);
+        IntKey key = await this.manager.CreateAsync(model, new CreateOperationMapper())
+                               .ConfigureAwait(true);
 
         string? initialClientSecret = model.ClientSecret;
 
         // ACT.
-        await manager.RotateClientSecretAsync(key)
-                     .ConfigureAwait(true);
+        await this.manager.RotateClientSecretAsync(key)
+                  .ConfigureAwait(true);
 
         // ASSERT.
-        Model application = await manager.GetByKeyAsync(key)
-                                         .ConfigureAwait(true);
+        Model application = await this.manager.GetByKeyAsync(key)
+                                      .ConfigureAwait(true);
 
         initialClientSecret.Should()
                            .NotMatch(application.ClientSecret);

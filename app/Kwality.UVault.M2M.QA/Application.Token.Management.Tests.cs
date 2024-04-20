@@ -47,6 +47,10 @@ using Xunit;
 
 public sealed class ApplicationTokenManagementTests
 {
+    private readonly ApplicationTokenManager<Model> manager
+        = new ApplicationTokenManagerFactory().Create<Model, ApplicationModel<IntKey>, IntKey>(static options =>
+            options.UseStore<Store>());
+
     [AutoDomainData]
     [M2MTokenManagement]
     [Theory(DisplayName = "When the store is configured as a `Singleton` one, it behaves as such.")]
@@ -103,14 +107,9 @@ public sealed class ApplicationTokenManagementTests
     [Theory(DisplayName = "Get access token succeeds.")]
     internal async Task GetToken_Succeeds(string clientId, string clientSecret, string audience, string grantType)
     {
-        // ARRANGE.
-        ApplicationTokenManager<Model> manager
-            = new ApplicationTokenManagerFactory().Create<Model, ApplicationModel<IntKey>, IntKey>(static options =>
-                options.UseStore<Store>());
-
         // ACT.
-        Model result = await manager.GetAccessTokenAsync(clientId, clientSecret, audience, grantType)
-                                    .ConfigureAwait(true);
+        Model result = await this.manager.GetAccessTokenAsync(clientId, clientSecret, audience, grantType)
+                                 .ConfigureAwait(true);
 
         // ASSERT.
         result.Token.Should()

@@ -41,15 +41,14 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class Auth0ApplicationFilterTests
 {
+    private readonly ApplicationFilter filter = new();
+
     [M2MManagement]
     [Fact(DisplayName = "Map to an invalid destination raises an exception.")]
     internal void Map_InvalidDestination_RaisesException()
     {
-        // ARRANGE.
-        var mapper = new ApplicationFilter();
-
         // ACT.
-        Action act = () => mapper.Create<Expression<Func<string, bool>>>();
+        Action act = () => this.filter.Create<Expression<Func<string, bool>>>();
 
         // ASSERT.
         act.Should()
@@ -61,11 +60,8 @@ public sealed class Auth0ApplicationFilterTests
     [Fact(DisplayName = "Map succeeds.")]
     internal void Map_Succeeds()
     {
-        // ARRANGE.
-        var mapper = new ApplicationFilter();
-
         // ACT.
-        var result = mapper.Create<GetClientsRequest>();
+        var result = this.filter.Create<GetClientsRequest>();
 
         // ASSERT.
         result.Should()

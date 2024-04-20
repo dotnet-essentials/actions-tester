@@ -24,6 +24,8 @@
 // =====================================================================================================================
 namespace Kwality.UVault.Grants.Auth0.Stores;
 
+using System.Diagnostics.CodeAnalysis;
+
 using global::Auth0.Core.Exceptions;
 using global::Auth0.ManagementApi;
 using global::Auth0.ManagementApi.Models;
@@ -104,32 +106,40 @@ internal sealed class GrantStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException("Failed to read client grants.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException("Failed to read client grants.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.GetAllInternalAsync(pageIndex, pageSize, filter)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException("Failed to read client grants.", ex);
-            }
+            return await this.HandleGetAllInternalRateLimitExceptionAsync(pageIndex, pageSize, filter, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new ReadException("Failed to read client grants.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<PagedResultSet<TModel>> HandleGetAllInternalRateLimitExceptionAsync(
+        int pageIndex, int pageSize, IGrantFilter? filter, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException("Failed to read client grants.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException("Failed to read client grants.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.GetAllInternalAsync(pageIndex, pageSize, filter)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException("Failed to read client grants.", ex);
         }
     }
 
@@ -149,32 +159,40 @@ internal sealed class GrantStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException("Failed to create client grant.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException("Failed to create client grant.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.CreateInternalAsync(model, mapper)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException("Failed to create client grant.", ex);
-            }
+            return await this.HandleCreateInternalRateLimitExceptionAsync(model, mapper, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new CreateException("Failed to create client grant.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<StringKey> HandleCreateInternalRateLimitExceptionAsync(
+        TModel model, IGrantOperationMapper mapper, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException("Failed to create client grant.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException("Failed to create client grant.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.CreateInternalAsync(model, mapper)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException("Failed to create client grant.", ex);
         }
     }
 
@@ -190,34 +208,42 @@ internal sealed class GrantStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to update client grant: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to update client grant: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    await this.UpdateInternalAsync(key, model, mapper)
-                              .ConfigureAwait(false);
-
-                    break;
-
-                default:
-                    throw new ReadException($"Failed to update client grant: `{key}`.", ex);
-            }
+            await this.HandleUpdateInternalRateLimitExceptionAsync(key, model, mapper, ex)
+                      .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new UpdateException($"Failed to update client grant: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task HandleUpdateInternalRateLimitExceptionAsync(
+        StringKey key, TModel model, IGrantOperationMapper mapper, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to update client grant: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to update client grant: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                await this.UpdateInternalAsync(key, model, mapper)
+                          .ConfigureAwait(false);
+
+                break;
+
+            default:
+                throw new ReadException($"Failed to update client grant: `{key}`.", ex);
         }
     }
 
@@ -233,34 +259,41 @@ internal sealed class GrantStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to delete client grant: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to delete client grant: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    await this.DeleteByKeyInternalAsync(key)
-                              .ConfigureAwait(false);
-
-                    break;
-
-                default:
-                    throw new ReadException($"Failed to delete client grant: `{key}`.", ex);
-            }
+            await this.HandleDeleteByKeyInternalRateLimitExceptionAsync(key, ex)
+                      .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new UpdateException($"Failed to delete client grant: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task HandleDeleteByKeyInternalRateLimitExceptionAsync(StringKey key, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to delete client grant: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to delete client grant: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                await this.DeleteByKeyInternalAsync(key)
+                          .ConfigureAwait(false);
+
+                break;
+
+            default:
+                throw new ReadException($"Failed to delete client grant: `{key}`.", ex);
         }
     }
 

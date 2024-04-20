@@ -34,4 +34,8 @@
     <ProjectReference Include="..\Kwality.UVault.Users\Kwality.UVault.Users.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Internal\" />
+  </ItemGroup>
+
 </Project>

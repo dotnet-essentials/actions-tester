@@ -36,7 +36,7 @@ using Kwality.UVault.QA.Common.Xunit.Traits;
 using Kwality.UVault.Users.Managers;
 using Kwality.UVault.Users.Models;
 using Kwality.UVault.Users.Operations.Mappers;
-using Kwality.UVault.Users.QA.Factories;
+using Kwality.UVault.Users.QA.Internal.Factories;
 
 using Xunit;
 

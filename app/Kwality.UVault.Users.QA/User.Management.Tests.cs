@@ -41,7 +41,7 @@ using Kwality.UVault.Users.Extensions;
 using Kwality.UVault.Users.Managers;
 using Kwality.UVault.Users.Models;
 using Kwality.UVault.Users.Operations.Mappers.Abstractions;
-using Kwality.UVault.Users.QA.Factories;
+using Kwality.UVault.Users.QA.Internal.Factories;
 using Kwality.UVault.Users.Stores.Abstractions;
 
 using Microsoft.Extensions.DependencyInjection;

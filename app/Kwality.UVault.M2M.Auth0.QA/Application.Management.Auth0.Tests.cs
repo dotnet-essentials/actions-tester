@@ -58,19 +58,20 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class ApplicationManagementAuth0Tests
 {
-    private readonly ApplicationManager<Model, StringKey> applicationManager;
+    private const int rateLimitMaxRetryCount = 5;
+    private readonly ApplicationManager<Model, StringKey> manager;
 
     public ApplicationManagementAuth0Tests()
     {
         ApiConfiguration apiConfiguration = GetApiConfiguration();
 
-        this.applicationManager = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
+        this.manager = new ApplicationManagerFactory().Create<Model, StringKey>(options =>
             options.UseAuth0Store<Model, ModelMapper>(apiConfiguration,
                 static () => new Auth0Options
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
                     RateLimitRetryInterval = TimeSpan.FromSeconds(2),
-                    RateLimitMaxRetryCount = 5,
+                    RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }
 
@@ -85,12 +86,11 @@ public sealed class ApplicationManagementAuth0Tests
 
         try
         {
-            key = await this.applicationManager
-                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+            key = await this.manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
                             .ConfigureAwait(true);
 
             // ACT.
-            PagedResultSet<Model> result = await this.applicationManager.GetAllAsync(0, 5)
+            PagedResultSet<Model> result = await this.manager.GetAllAsync(0, 5)
                                                      .ConfigureAwait(true);
 
             // ASSERT.
@@ -113,7 +113,7 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(key)
+                await this.manager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
             }
         }
@@ -130,12 +130,11 @@ public sealed class ApplicationManagementAuth0Tests
 
         try
         {
-            key = await this.applicationManager
-                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+            key = await this.manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
                             .ConfigureAwait(true);
 
             // ACT.
-            PagedResultSet<Model> result = await this.applicationManager.GetAllAsync(1, 10)
+            PagedResultSet<Model> result = await this.manager.GetAllAsync(1, 10)
                                                      .ConfigureAwait(true);
 
             // ASSERT.
@@ -151,7 +150,7 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(key)
+                await this.manager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
             }
         }
@@ -168,12 +167,11 @@ public sealed class ApplicationManagementAuth0Tests
 
         try
         {
-            key = await this.applicationManager
-                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+            key = await this.manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
                             .ConfigureAwait(true);
 
             // ACT.
-            PagedResultSet<Model> result = await this.applicationManager.GetAllAsync(3, 1)
+            PagedResultSet<Model> result = await this.manager.GetAllAsync(3, 1)
                                                      .ConfigureAwait(true);
 
             // ASSERT.
@@ -195,7 +193,7 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the applications in Auth0.
             if (key != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(key)
+                await this.manager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
             }
         }
@@ -213,19 +211,18 @@ public sealed class ApplicationManagementAuth0Tests
 
         try
         {
-            keyOne = await this.applicationManager
-                               .CreateAsync(modelOne, new CreateOperationMapper(ClientApplicationType.Native))
+            keyOne = await this.manager.CreateAsync(modelOne, new CreateOperationMapper(ClientApplicationType.Native))
                                .ConfigureAwait(true);
 
-            keyTwo = await this.applicationManager.CreateAsync(modelTwo,
+            keyTwo = await this.manager.CreateAsync(modelTwo,
                                    new CreateOperationMapper(ClientApplicationType.NonInteractive))
                                .ConfigureAwait(true);
 
             // ACT.
-            PagedResultSet<Model> result = await this.applicationManager
-                                                     .GetAllAsync(0, 10,
-                                                         new OperationFilter(ClientApplicationType.NonInteractive))
-                                                     .ConfigureAwait(true);
+            PagedResultSet<Model> result = await this
+                                                 .manager.GetAllAsync(0, 10,
+                                                     new OperationFilter(ClientApplicationType.NonInteractive))
+                                                 .ConfigureAwait(true);
 
             // ASSERT.
             result.ResultSet.Count()
@@ -242,13 +239,13 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the applications in Auth0.
             if (keyOne != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(keyOne)
+                await this.manager.DeleteByKeyAsync(keyOne)
                           .ConfigureAwait(true);
             }
 
             if (keyTwo != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(keyTwo)
+                await this.manager.DeleteByKeyAsync(keyTwo)
                           .ConfigureAwait(true);
             }
         }
@@ -261,7 +258,7 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task GetByKey_UnknownKey_RaisesException(StringKey key)
     {
         // ACT.
-        Func<Task<Model>> act = () => this.applicationManager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.manager.GetByKeyAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -281,12 +278,11 @@ public sealed class ApplicationManagementAuth0Tests
         try
         {
             // ACT.
-            key = await this.applicationManager
-                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+            key = await this.manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
                             .ConfigureAwait(true);
 
             // ASSERT.
-            (await this.applicationManager.GetByKeyAsync(key)
+            (await this.manager.GetByKeyAsync(key)
                        .ConfigureAwait(true)).Should()
                                              .BeEquivalentTo(model,
                                                  static options => options.Excluding(static application =>
@@ -297,7 +293,7 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(key)
+                await this.manager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
             }
         }
@@ -314,17 +310,16 @@ public sealed class ApplicationManagementAuth0Tests
 
         try
         {
-            key = await this.applicationManager
-                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+            key = await this.manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
                             .ConfigureAwait(true);
 
             // ACT.
             model.Name = "UVault (Sample application)";
 
-            await this.applicationManager.UpdateAsync(key, model, new UpdateOperationMapper())
+            await this.manager.UpdateAsync(key, model, new UpdateOperationMapper())
                       .ConfigureAwait(true);
 
-            (await this.applicationManager.GetByKeyAsync(key)
+            (await this.manager.GetByKeyAsync(key)
                        .ConfigureAwait(true)).Should()
                                              .BeEquivalentTo(model, static options => options
                                                  .Excluding(static application => application.ClientSecret)
@@ -335,7 +330,7 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(key)
+                await this.manager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
             }
         }
@@ -348,7 +343,7 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task Update_UnknownKey_RaisesException(StringKey key, Model model)
     {
         // ACT.
-        Func<Task> act = () => this.applicationManager.UpdateAsync(key, model, new UpdateOperationMapper());
+        Func<Task> act = () => this.manager.UpdateAsync(key, model, new UpdateOperationMapper());
 
         // ASSERT.
         await act.Should()
@@ -364,16 +359,17 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task Delete_Succeeds(Model model)
     {
         // ARRANGE.
-        StringKey key = await this.applicationManager
-                                  .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
-                                  .ConfigureAwait(true);
+        StringKey key = await this
+                              .manager.CreateAsync(model,
+                                  new CreateOperationMapper(ClientApplicationType.NonInteractive))
+                              .ConfigureAwait(true);
 
         // ACT.
-        await this.applicationManager.DeleteByKeyAsync(key)
+        await this.manager.DeleteByKeyAsync(key)
                   .ConfigureAwait(true);
 
         // ASSERT.
-        Func<Task<Model>> act = () => this.applicationManager.GetByKeyAsync(key);
+        Func<Task<Model>> act = () => this.manager.GetByKeyAsync(key);
 
         await act.Should()
                  .ThrowAsync<ReadException>()
@@ -388,7 +384,7 @@ public sealed class ApplicationManagementAuth0Tests
     internal async Task RotateClientSecret_UnknownKey_RaisesException(StringKey key)
     {
         // ACT.
-        Func<Task<Model>> act = () => this.applicationManager.RotateClientSecretAsync(key);
+        Func<Task<Model>> act = () => this.manager.RotateClientSecretAsync(key);
 
         // ASSERT.
         await act.Should()
@@ -408,19 +404,18 @@ public sealed class ApplicationManagementAuth0Tests
 
         try
         {
-            key = await this.applicationManager
-                            .CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
+            key = await this.manager.CreateAsync(model, new CreateOperationMapper(ClientApplicationType.NonInteractive))
                             .ConfigureAwait(true);
 
-            Model initialApplication = await this.applicationManager.GetByKeyAsync(key)
+            Model initialApplication = await this.manager.GetByKeyAsync(key)
                                                  .ConfigureAwait(true);
 
             // ACT.
-            await this.applicationManager.RotateClientSecretAsync(key)
+            await this.manager.RotateClientSecretAsync(key)
                       .ConfigureAwait(true);
 
             // ASSERT.
-            Model application = await this.applicationManager.GetByKeyAsync(key)
+            Model application = await this.manager.GetByKeyAsync(key)
                                           .ConfigureAwait(true);
 
             initialApplication.ClientSecret.Should()
@@ -431,7 +426,7 @@ public sealed class ApplicationManagementAuth0Tests
             // Cleanup: Remove the application in Auth0.
             if (key != null)
             {
-                await this.applicationManager.DeleteByKeyAsync(key)
+                await this.manager.DeleteByKeyAsync(key)
                           .ConfigureAwait(true);
             }
         }

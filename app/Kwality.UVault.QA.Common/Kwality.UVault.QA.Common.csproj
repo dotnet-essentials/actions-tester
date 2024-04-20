@@ -18,4 +18,8 @@
     <PackageReference Include="xunit.extensibility.core" Version="2.7.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Kwality.UVault.APIs.Auth0\Kwality.UVault.APIs.Auth0.csproj" />
+  </ItemGroup>
+
 </Project>

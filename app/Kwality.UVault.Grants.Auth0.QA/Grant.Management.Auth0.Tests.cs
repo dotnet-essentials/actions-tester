@@ -57,6 +57,7 @@ using Xunit;
 [SuppressMessage("ReSharper", "MemberCanBeFileLocal")]
 public sealed class GrantManagementAuth0Tests
 {
+    private const int rateLimitMaxRetryCount = 5;
     private readonly GrantManager<Model, StringKey> grantManager;
 
     public GrantManagementAuth0Tests()
@@ -69,7 +70,7 @@ public sealed class GrantManagementAuth0Tests
                 {
                     RateLimitBehaviour = RateLimitBehaviour.Retry,
                     RateLimitRetryInterval = TimeSpan.FromSeconds(2),
-                    RateLimitMaxRetryCount = 5,
+                    RateLimitMaxRetryCount = rateLimitMaxRetryCount,
                 }));
     }
 

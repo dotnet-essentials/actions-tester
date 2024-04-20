@@ -24,6 +24,8 @@
 // =====================================================================================================================
 namespace Kwality.UVault.APIs.Auth0.Stores;
 
+using System.Diagnostics.CodeAnalysis;
+
 using global::Auth0.Core.Exceptions;
 using global::Auth0.ManagementApi;
 using global::Auth0.ManagementApi.Models;
@@ -84,32 +86,39 @@ internal sealed class ApiStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to read API: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to read API: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.GetByKeyInternalAsync(key)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException($"Failed to read API: `{key}`.", ex);
-            }
+            return await this.HandleByKeyInternalRateLimitExceptionAsync(key, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new ReadException($"Failed to read API: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<TModel> HandleByKeyInternalRateLimitExceptionAsync(StringKey key, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to read API: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to read API: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.GetByKeyInternalAsync(key)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException($"Failed to read API: `{key}`.", ex);
         }
     }
 
@@ -129,32 +138,40 @@ internal sealed class ApiStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException("Failed to create API.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException("Failed to create API.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    return await this.CreateInternalAsync(model, mapper)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException("Failed to create API.", ex);
-            }
+            return await this.HandleCreateInternalRateLimitExceptionAsync(model, mapper, ex)
+                             .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new CreateException("Failed to create API.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<StringKey> HandleCreateInternalRateLimitExceptionAsync(
+        TModel model, IApiOperationMapper mapper, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException("Failed to create API.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException("Failed to create API.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                return await this.CreateInternalAsync(model, mapper)
+                                 .ConfigureAwait(false);
+
+            default:
+                throw new ReadException("Failed to create API.", ex);
         }
     }
 
@@ -170,34 +187,41 @@ internal sealed class ApiStore<TModel>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
-                    throw new ReadException($"Failed to delete API: `{key}`.", ex);
-
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException($"Failed to delete API: `{key}`.", ex);
-                    }
-
-                    options.RetryCount += 1;
-
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
-
-                    await this.DeleteByKeyInternalAsync(key)
-                              .ConfigureAwait(false);
-
-                    break;
-
-                default:
-                    throw new ReadException($"Failed to delete API: `{key}`.", ex);
-            }
+            await this.HandleDeleteByKeyInternalRateLimitExceptionAsync(key, ex)
+                      .ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             throw new UpdateException($"Failed to delete API: `{key}`.", ex);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task HandleDeleteByKeyInternalRateLimitExceptionAsync(StringKey key, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException($"Failed to delete API: `{key}`.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
+                    throw new ReadException($"Failed to delete API: `{key}`.", ex);
+                }
+
+                options.RetryCount += 1;
+
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
+
+                await this.DeleteByKeyInternalAsync(key)
+                          .ConfigureAwait(false);
+
+                break;
+
+            default:
+                throw new ReadException($"Failed to delete API: `{key}`.", ex);
         }
     }
 

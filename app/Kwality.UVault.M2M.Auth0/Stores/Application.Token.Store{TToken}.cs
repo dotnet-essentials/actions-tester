@@ -24,6 +24,8 @@
 // =====================================================================================================================
 namespace Kwality.UVault.M2M.Auth0.Stores;
 
+using System.Diagnostics.CodeAnalysis;
+
 using global::Auth0.Core.Exceptions;
 
 using JetBrains.Annotations;
@@ -81,28 +83,38 @@ internal sealed class ApplicationTokenStore<TToken>(
         }
         catch (RateLimitApiException ex)
         {
-            switch (options.RateLimitBehaviour)
-            {
-                case RateLimitBehaviour.Fail:
+            return await this
+                         .HandleRotateClientSecretInternalRateLimitExceptionAsync(clientId, clientSecret, audience,
+                             grantType, ex)
+                         .ConfigureAwait(false);
+        }
+    }
+
+    [ExcludeFromCodeCoverage]
+    private async Task<TToken> HandleRotateClientSecretInternalRateLimitExceptionAsync(
+        string clientId, string clientSecret, string audience, string grantType, Exception ex)
+    {
+        switch (options.RateLimitBehaviour)
+        {
+            case RateLimitBehaviour.Fail:
+                throw new ReadException("Failed to retrieve an access token.", ex);
+
+            case RateLimitBehaviour.Retry:
+                if (options.RetryCount > options.RateLimitMaxRetryCount)
+                {
                     throw new ReadException("Failed to retrieve an access token.", ex);
+                }
 
-                case RateLimitBehaviour.Retry:
-                    if (options.RetryCount > options.RateLimitMaxRetryCount)
-                    {
-                        throw new ReadException("Failed to retrieve an access token.", ex);
-                    }
+                options.RetryCount += 1;
 
-                    options.RetryCount += 1;
+                await Task.Delay(options.RateLimitRetryInterval)
+                          .ConfigureAwait(false);
 
-                    await Task.Delay(options.RateLimitRetryInterval)
-                              .ConfigureAwait(false);
+                return await this.GetAccessTokenInternalAsync(clientId, clientSecret, audience, grantType)
+                                 .ConfigureAwait(false);
 
-                    return await this.GetAccessTokenInternalAsync(clientId, clientSecret, audience, grantType)
-                                     .ConfigureAwait(false);
-
-                default:
-                    throw new ReadException("Failed to retrieve an access token.", ex);
-            }
+            default:
+                throw new ReadException("Failed to retrieve an access token.", ex);
         }
     }
 }

@@ -41,16 +41,15 @@ using Xunit;
 
 public sealed class Auth0ApplicationUpdateOperationMapperTests
 {
+    private readonly OperationMapper mapper = new();
+
     [M2MManagement]
     [AutoData]
     [Theory(DisplayName = "Map to an invalid destination raises an exception.")]
     internal void Map_InvalidDestination_RaisesException(ModelOne model)
     {
-        // ARRANGE.
-        var mapper = new OperationMapper();
-
         // ACT.
-        Action act = () => mapper.Create<ModelOne, ModelTwo>(model);
+        Action act = () => this.mapper.Create<ModelOne, ModelTwo>(model);
 
         // ASSERT.
         act.Should()
@@ -64,11 +63,8 @@ public sealed class Auth0ApplicationUpdateOperationMapperTests
     [Theory(DisplayName = "Map succeeds.")]
     internal void Map_Succeeds(ModelOne model)
     {
-        // ARRANGE.
-        var mapper = new OperationMapper();
-
         // ACT.
-        ClientUpdateRequest result = mapper.Create<ModelOne, ClientUpdateRequest>(model);
+        ClientUpdateRequest result = this.mapper.Create<ModelOne, ClientUpdateRequest>(model);
 
         // ASSERT.
         result.Should()
