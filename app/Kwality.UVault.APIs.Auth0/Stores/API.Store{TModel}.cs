@@ -30,8 +30,6 @@ using global::Auth0.Core.Exceptions;
 using global::Auth0.ManagementApi;
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Auth0.Mapping.Abstractions;
 using Kwality.UVault.APIs.Auth0.Models;
 using Kwality.UVault.APIs.Auth0.Options;
@@ -43,7 +41,9 @@ using Kwality.UVault.Core.Auth0.Configuration;
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Keys;
 
+#pragma warning disable CA1812
 internal sealed class ApiStore<TModel>(
+#pragma warning restore CA1812
     ManagementClient client,
     ApiConfiguration configuration,
     IModelMapper<TModel> modelMapper,

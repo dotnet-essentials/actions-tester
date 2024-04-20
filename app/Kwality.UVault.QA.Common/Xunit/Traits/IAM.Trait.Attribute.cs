@@ -29,8 +29,6 @@ using global::System.Diagnostics.CodeAnalysis;
 using global::Xunit.Abstractions;
 using global::Xunit.Sdk;
 
-using JetBrains.Annotations;
-
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 [TraitDiscoverer("Kwality.UVault.QA.Common.Xunit.Traits.IAMFeatureDiscoverer", "Kwality.UVault.QA.Common")]
 [SuppressMessage("ReSharper", "InconsistentNaming")]

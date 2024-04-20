@@ -27,8 +27,6 @@ namespace Kwality.UVault.QA.Common.Xunit.Traits;
 using global::Xunit.Abstractions;
 using global::Xunit.Sdk;
 
-using JetBrains.Annotations;
-
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 [TraitDiscoverer("Kwality.UVault.QA.Common.Xunit.Traits.E2ETargetDiscoverer", "Kwality.UVault.QA.Common")]
 public sealed class E2EAttribute : Attribute, ITraitAttribute

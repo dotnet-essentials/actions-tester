@@ -26,8 +26,6 @@ namespace Kwality.UVault.IAM.Extensions;
 
 using System.Diagnostics.CodeAnalysis;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Options;
 using Kwality.UVault.IAM.Options;
 

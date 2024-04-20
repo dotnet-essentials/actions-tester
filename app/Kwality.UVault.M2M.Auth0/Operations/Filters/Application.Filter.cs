@@ -26,8 +26,6 @@ namespace Kwality.UVault.M2M.Auth0.Operations.Filters;
 
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.M2M.Operations.Filters.Abstractions;

@@ -32,8 +32,6 @@ using AutoFixture.Xunit2;
 
 using FluentAssertions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Extensions;
 using Kwality.UVault.APIs.Managers;
 using Kwality.UVault.APIs.Models;

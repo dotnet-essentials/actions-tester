@@ -33,8 +33,6 @@ using FluentAssertions;
 
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.APIs.Auth0.Extensions;
 using Kwality.UVault.APIs.Auth0.Mapping.Abstractions;
 using Kwality.UVault.APIs.Auth0.Models;

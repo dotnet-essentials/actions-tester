@@ -31,8 +31,6 @@ using global::Auth0.ManagementApi;
 using global::Auth0.ManagementApi.Models;
 using global::Auth0.ManagementApi.Paging;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Auth0.API.Clients;
 using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Configuration;

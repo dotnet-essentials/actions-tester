@@ -26,8 +26,6 @@ namespace Kwality.UVault.IAM.Options;
 
 using System.Diagnostics.CodeAnalysis;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.IAM.Validators.Abstractions;
 
 using Microsoft.AspNetCore.Authentication;

@@ -30,8 +30,6 @@ using global::Auth0.Core.Exceptions;
 using global::Auth0.ManagementApi;
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Auth0.API.Clients;
 using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Configuration;
@@ -43,12 +41,13 @@ using Kwality.UVault.Users.Auth0.Options;
 using Kwality.UVault.Users.Operations.Mappers.Abstractions;
 using Kwality.UVault.Users.Stores.Abstractions;
 
-
+#pragma warning disable CA1812
 internal sealed class UserStore<TModel>(
     ManagementClient managementClient,
     ApiConfiguration apiConfiguration,
     IModelMapper<TModel> modelMapper,
     Auth0Options options) : IUserStore<TModel, StringKey>
+#pragma warning restore CA1812
     where TModel : UserModel
 {
     private const string createError = "Failed to create user.";

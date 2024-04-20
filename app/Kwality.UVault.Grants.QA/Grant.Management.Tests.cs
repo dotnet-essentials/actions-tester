@@ -32,8 +32,6 @@ using AutoFixture.Xunit2;
 
 using FluentAssertions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Extensions;
 using Kwality.UVault.Core.Helpers;

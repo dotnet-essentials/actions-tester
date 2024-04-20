@@ -28,8 +28,6 @@ using System.Diagnostics.CodeAnalysis;
 
 using global::Auth0.Core.Exceptions;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Auth0.API.Clients;
 using Kwality.UVault.Core.Auth0.Behaviour;
 using Kwality.UVault.Core.Auth0.Models;
@@ -40,12 +38,13 @@ using Kwality.UVault.M2M.Auth0.Options;
 using Kwality.UVault.M2M.Models;
 using Kwality.UVault.M2M.Stores.Abstractions;
 
-
+#pragma warning disable CA1812
 internal sealed class ApplicationTokenStore<TToken>(
     ManagementClient managementClient,
     M2MConfiguration m2MConfiguration,
     IModelTokenMapper<TToken> modelMapper,
     Auth0Options options) : IApplicationTokenStore<TToken>
+#pragma warning restore CA1812
     where TToken : TokenModel
 {
     private const string readError = "Failed to retrieve an access token.";

@@ -26,8 +26,6 @@ namespace Kwality.UVault.M2M.Auth0.Operations.Mappers;
 
 using global::Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Exceptions;
 using Kwality.UVault.Core.Helpers;
 using Kwality.UVault.M2M.Operations.Mappers.Abstractions;
