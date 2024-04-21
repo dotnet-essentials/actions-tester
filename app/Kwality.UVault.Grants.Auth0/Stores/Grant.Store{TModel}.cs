@@ -53,6 +53,9 @@ internal sealed class GrantStore<TModel>(
     Auth0Options options) : IGrantStore<TModel, StringKey>
     where TModel : GrantModel
 {
+    private const string readError = "Failed to read client grants.";
+    private const string createError = "Failed to create client grant.";
+
     public Task<PagedResultSet<TModel>> GetAllAsync(int pageIndex, int pageSize, IGrantFilter? filter)
     {
         options.RetryCount = 0;
@@ -109,7 +112,7 @@ internal sealed class GrantStore<TModel>(
         }
         catch (Exception ex)
         {
-            throw new ReadException("Failed to read client grants.", ex);
+            throw new ReadException(readError, ex);
         }
     }
 
@@ -120,12 +123,12 @@ internal sealed class GrantStore<TModel>(
         switch (options.RateLimitBehaviour)
         {
             case RateLimitBehaviour.Fail:
-                throw new ReadException("Failed to read client grants.", ex);
+                throw new ReadException(readError, ex);
 
             case RateLimitBehaviour.Retry:
                 if (options.RetryCount > options.RateLimitMaxRetryCount)
                 {
-                    throw new ReadException("Failed to read client grants.", ex);
+                    throw new ReadException(readError, ex);
                 }
 
                 options.RetryCount += 1;
@@ -137,7 +140,7 @@ internal sealed class GrantStore<TModel>(
                                  .ConfigureAwait(false);
 
             default:
-                throw new ReadException("Failed to read client grants.", ex);
+                throw new ReadException(readError, ex);
         }
     }
 
@@ -163,7 +166,7 @@ internal sealed class GrantStore<TModel>(
         }
         catch (Exception ex)
         {
-            throw new CreateException("Failed to create client grant.", ex);
+            throw new CreateException(createError, ex);
         }
     }
 
@@ -174,12 +177,12 @@ internal sealed class GrantStore<TModel>(
         switch (options.RateLimitBehaviour)
         {
             case RateLimitBehaviour.Fail:
-                throw new ReadException("Failed to create client grant.", ex);
+                throw new ReadException(createError, ex);
 
             case RateLimitBehaviour.Retry:
                 if (options.RetryCount > options.RateLimitMaxRetryCount)
                 {
-                    throw new ReadException("Failed to create client grant.", ex);
+                    throw new ReadException(createError, ex);
                 }
 
                 options.RetryCount += 1;
@@ -191,7 +194,7 @@ internal sealed class GrantStore<TModel>(
                                  .ConfigureAwait(false);
 
             default:
-                throw new ReadException("Failed to create client grant.", ex);
+                throw new ReadException(createError, ex);
         }
     }
 

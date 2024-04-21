@@ -26,11 +26,8 @@ namespace Kwality.UVault.E2E.App.Models.Mappers;
 
 using Auth0.ManagementApi.Models;
 
-using JetBrains.Annotations;
-
 using Kwality.UVault.Core.Keys;
 using Kwality.UVault.Users.Auth0.Mapping.Abstractions;
-
 
 #pragma warning disable CA1812
 internal sealed class UserModelMapper : IModelMapper<UserModel>
