@@ -324,9 +324,8 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType ==
-                    typeof(UserManager<Model, IntKey, Model>));
+                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                    descriptor.ImplementationType == typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -353,9 +352,8 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType ==
-                    typeof(UserManager<Model, IntKey, Model>));
+                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                    descriptor.ImplementationType == typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -382,9 +380,8 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType ==
-                    typeof(UserManager<Model, IntKey, Model>));
+                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                    descriptor.ImplementationType == typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -411,9 +408,8 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
-                                                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType ==
-                    typeof(UserManager<Model, IntKey, Model>));
+                    descriptor.Lifetime == ServiceLifetime.Scoped &&
+                    descriptor.ImplementationType == typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -764,7 +760,6 @@ public sealed class UserManagementTests
     }
 #pragma warning disable CA1812
     private sealed class DataStore : IUserDataStore<Model, IntKey>
-
 #pragma warning restore CA1812
     {
         public Task CreateAsync(IntKey key, Model data)
