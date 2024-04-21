@@ -147,14 +147,14 @@ public sealed class ApplicationManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor =>
@@ -169,14 +169,14 @@ public sealed class ApplicationManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseApplicationManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Singleton));
+            options.UseApplicationManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Singleton));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor =>
@@ -191,14 +191,14 @@ public sealed class ApplicationManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseApplicationManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Scoped));
+            options.UseApplicationManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Scoped));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor =>
@@ -213,14 +213,14 @@ public sealed class ApplicationManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseApplicationManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Transient));
+            options.UseApplicationManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Transient));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor =>
@@ -236,7 +236,7 @@ public sealed class ApplicationManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseStore<Store>();
         }));
 
         // ASSERT.
@@ -249,8 +249,7 @@ public sealed class ApplicationManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(IApplicationStore<Model, IntKey>) &&
-                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                    descriptor.Lifetime == ServiceLifetime.Scoped && descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -261,7 +260,7 @@ public sealed class ApplicationManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Singleton);
+            options.UseStore<Store>(ServiceLifetime.Singleton);
         }));
 
         // ASSERT.
@@ -274,8 +273,7 @@ public sealed class ApplicationManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(IApplicationStore<Model, IntKey>) &&
-                    descriptor.Lifetime == ServiceLifetime.Singleton &&
-                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                    descriptor.Lifetime == ServiceLifetime.Singleton && descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -286,7 +284,7 @@ public sealed class ApplicationManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Scoped);
+            options.UseStore<Store>(ServiceLifetime.Scoped);
         }));
 
         // ASSERT.
@@ -299,8 +297,7 @@ public sealed class ApplicationManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(IApplicationStore<Model, IntKey>) &&
-                    descriptor.Lifetime == ServiceLifetime.Scoped &&
-                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                    descriptor.Lifetime == ServiceLifetime.Scoped && descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -311,7 +308,7 @@ public sealed class ApplicationManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Transient);
+            options.UseStore<Store>(ServiceLifetime.Transient);
         }));
 
         // ASSERT.
@@ -324,8 +321,7 @@ public sealed class ApplicationManagementTests
         services.Should()
                 .ContainSingle(static descriptor =>
                     descriptor.ServiceType == typeof(IApplicationStore<Model, IntKey>) &&
-                    descriptor.Lifetime == ServiceLifetime.Transient &&
-                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                    descriptor.Lifetime == ServiceLifetime.Transient && descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -354,12 +350,12 @@ public sealed class ApplicationManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ACT.
-        Func<Manager<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                         .GetRequiredService<Manager<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -374,13 +370,13 @@ public sealed class ApplicationManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApplicationManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<ManagerStore<Model, IntKey>>();
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseManager<Manager>();
+            options.UseStore<Store>();
         }));
 
         // ACT.
-        Func<ManagerStore<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                              .GetRequiredService<ManagerStore<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -668,121 +664,10 @@ public sealed class ApplicationManagementTests
     }
 
 #pragma warning disable CA1812
-    private sealed class Store<TModel, TKey> : IApplicationStore<TModel, TKey>
+    private sealed class Manager(IApplicationStore<Model, IntKey> store) : ApplicationManager<Model, IntKey>(store);
 #pragma warning restore CA1812
-        where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        public Task<PagedResultSet<TModel>> GetAllAsync(int pageIndex, int pageSize, IApplicationFilter? filter)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<TModel> GetByKeyAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<TKey> CreateAsync(TModel model, IApplicationOperationMapper mapper)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task UpdateAsync(TKey key, TModel model, IApplicationOperationMapper mapper)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task DeleteByKeyAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<TModel> RotateClientSecretAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
 #pragma warning disable CA1812
-    private sealed class Manager<TModel, TKey>(IApplicationStore<TModel, TKey> store)
-#pragma warning restore CA1812
-        : ApplicationManager<TModel, TKey>(store)
-        where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>;
-
-#pragma warning disable CA1812
-    private sealed class ManagerStore<TModel, TKey>(IApplicationStore<TModel, TKey> store)
-        : ApplicationManager<TModel, TKey>(store)
-#pragma warning restore CA1812
-        where TModel : ApplicationModel<TKey>
-        where TKey : IEquatable<TKey>;
-
-#pragma warning disable CA1812
-    internal sealed class Model : ApplicationModel<IntKey>
-#pragma warning restore CA1812
-    {
-        public Model(IntKey key, string name)
-            : base(key)
-        {
-            this.Name = name;
-        }
-    }
-
-    private sealed class OperationFilter(string name) : IApplicationFilter
-    {
-        public TDestination Create<TDestination>()
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(Func<KeyValuePair<IntKey, Model>, bool>))
-            {
-                throw new ReadException(
-                    $"Invalid {nameof(IApplicationFilter)}: Destination is NOT `{typeof(Func<KeyValuePair<IntKey, Model>, bool>).Name}`.");
-            }
-
-            return ((Func<KeyValuePair<IntKey, Model>, bool>)Filter)
-                .UnsafeAs<Func<KeyValuePair<IntKey, Model>, bool>, TDestination>();
-
-            // The filter which is filters out data in the store.
-            bool Filter(KeyValuePair<IntKey, Model> kvp)
-            {
-                return kvp.Value.Name == name;
-            }
-        }
-    }
-
-    private sealed class CreateOperationMapper : IApplicationOperationMapper
-    {
-        public TDestination Create<TSource, TDestination>(TSource source)
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(TSource))
-            {
-                throw new CreateException(
-                    $"Invalid {nameof(IApplicationOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
-            }
-
-            return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
-
-    private sealed class UpdateOperationMapper : IApplicationOperationMapper
-    {
-        public TDestination Create<TSource, TDestination>(TSource source)
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(TSource))
-            {
-                throw new UpdateException(
-                    $"Invalid {nameof(IApplicationOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
-            }
-
-            return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
-
-#pragma warning disable CA1812
-    internal sealed class Store : IApplicationStore<Model, IntKey>
+    private sealed class Store : IApplicationStore<Model, IntKey>
 #pragma warning restore CA1812
     {
         private readonly Dictionary<IntKey, Model> collection = new();
@@ -857,6 +742,68 @@ public sealed class ApplicationManagementTests
             }
 
             throw new UpdateException($"Custom: Failed to update application: `{key}`. Not found.");
+        }
+    }
+#pragma warning disable CA1812
+    internal sealed class Model : ApplicationModel<IntKey>
+#pragma warning restore CA1812
+    {
+        public Model(IntKey key, string name)
+            : base(key)
+        {
+            this.Name = name;
+        }
+    }
+
+    private sealed class OperationFilter(string name) : IApplicationFilter
+    {
+        public TDestination Create<TDestination>()
+            where TDestination : class
+        {
+            if (typeof(TDestination) != typeof(Func<KeyValuePair<IntKey, Model>, bool>))
+            {
+                throw new ReadException(
+                    $"Invalid {nameof(IApplicationFilter)}: Destination is NOT `{typeof(Func<KeyValuePair<IntKey, Model>, bool>).Name}`.");
+            }
+
+            return ((Func<KeyValuePair<IntKey, Model>, bool>)Filter)
+                .UnsafeAs<Func<KeyValuePair<IntKey, Model>, bool>, TDestination>();
+
+            // The filter which is filters out data in the store.
+            bool Filter(KeyValuePair<IntKey, Model> kvp)
+            {
+                return kvp.Value.Name == name;
+            }
+        }
+    }
+
+    private sealed class CreateOperationMapper : IApplicationOperationMapper
+    {
+        public TDestination Create<TSource, TDestination>(TSource source)
+            where TDestination : class
+        {
+            if (typeof(TDestination) != typeof(TSource))
+            {
+                throw new CreateException(
+                    $"Invalid {nameof(IApplicationOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
+            }
+
+            return source.UnsafeAs<TSource, TDestination>();
+        }
+    }
+
+    private sealed class UpdateOperationMapper : IApplicationOperationMapper
+    {
+        public TDestination Create<TSource, TDestination>(TSource source)
+            where TDestination : class
+        {
+            if (typeof(TDestination) != typeof(TSource))
+            {
+                throw new UpdateException(
+                    $"Invalid {nameof(IApplicationOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
+            }
+
+            return source.UnsafeAs<TSource, TDestination>();
         }
     }
 

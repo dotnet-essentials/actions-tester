@@ -146,14 +146,14 @@ public sealed class GrantManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
@@ -167,14 +167,14 @@ public sealed class GrantManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseGrantManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Singleton));
+            options.UseGrantManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Singleton));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
@@ -188,14 +188,14 @@ public sealed class GrantManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseGrantManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Scoped));
+            options.UseGrantManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Scoped));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
@@ -209,14 +209,14 @@ public sealed class GrantManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseGrantManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Transient));
+            options.UseGrantManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Transient));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
@@ -231,7 +231,7 @@ public sealed class GrantManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseStore<Store>();
         }));
 
         // ASSERT.
@@ -244,7 +244,7 @@ public sealed class GrantManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -255,7 +255,7 @@ public sealed class GrantManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Singleton);
+            options.UseStore<Store>(ServiceLifetime.Singleton);
         }));
 
         // ASSERT.
@@ -268,7 +268,7 @@ public sealed class GrantManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Singleton &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -279,7 +279,7 @@ public sealed class GrantManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Scoped);
+            options.UseStore<Store>(ServiceLifetime.Scoped);
         }));
 
         // ASSERT.
@@ -292,7 +292,7 @@ public sealed class GrantManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -303,7 +303,7 @@ public sealed class GrantManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Transient);
+            options.UseStore<Store>(ServiceLifetime.Transient);
         }));
 
         // ASSERT.
@@ -316,7 +316,7 @@ public sealed class GrantManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IGrantStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Transient &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -344,12 +344,12 @@ public sealed class GrantManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ACT.
-        Func<Manager<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                         .GetRequiredService<Manager<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -364,13 +364,13 @@ public sealed class GrantManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseGrantManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<ManagerStore<Model, IntKey>>();
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseManager<Manager>();
+            options.UseStore<Store>();
         }));
 
         // ACT.
-        Func<ManagerStore<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                              .GetRequiredService<ManagerStore<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -596,43 +596,61 @@ public sealed class GrantManagementTests
     }
 
 #pragma warning disable CA1812
-    private sealed class Store<TModel, TKey> : IGrantStore<TModel, TKey>
+    private sealed class Manager(IGrantStore<Model, IntKey> store) : GrantManager<Model, IntKey>(store);
 #pragma warning restore CA1812
-        where TModel : GrantModel<TKey>
-        where TKey : IEquatable<TKey>
+#pragma warning disable CA1812
+    private sealed class Store : IGrantStore<Model, IntKey>
+#pragma warning restore CA1812
     {
-        public Task<PagedResultSet<TModel>> GetAllAsync(int pageIndex, int pageSize, IGrantFilter? filter)
+        private readonly Dictionary<IntKey, Model> collection = new();
+
+        public Task<PagedResultSet<Model>> GetAllAsync(int pageIndex, int pageSize, IGrantFilter? filter)
         {
-            throw new NotSupportedException();
+            IQueryable<KeyValuePair<IntKey, Model>> dataSet = this.collection.AsQueryable();
+
+            if (filter != null)
+            {
+                dataSet = dataSet.AsEnumerable()
+                                 .Where(filter.Create<Func<KeyValuePair<IntKey, Model>, bool>>())
+                                 .AsQueryable();
+            }
+
+            IEnumerable<Model> grants = dataSet.Skip(pageIndex * pageSize)
+                                               .Take(pageSize)
+                                               .Select(static kvp => kvp.Value);
+
+            var result = new PagedResultSet<Model>(grants, this.collection.Count > (pageIndex + 1) * pageSize);
+
+            return Task.FromResult(result);
         }
 
-        public Task<TKey> CreateAsync(TModel model, IGrantOperationMapper mapper)
+        public Task<IntKey> CreateAsync(Model model, IGrantOperationMapper mapper)
         {
-            throw new NotSupportedException();
+            this.collection.Add(model.Key, mapper.Create<Model, Model>(model));
+
+            return Task.FromResult(model.Key);
         }
 
-        public Task UpdateAsync(TKey key, TModel model, IGrantOperationMapper mapper)
+        public async Task UpdateAsync(IntKey key, Model model, IGrantOperationMapper mapper)
         {
-            throw new NotSupportedException();
+            if (!this.collection.ContainsKey(key))
+            {
+                throw new UpdateException($"Custom: Failed to update client grant: `{key}`. Not found.");
+            }
+
+            this.collection.Remove(key);
+
+            await this.CreateAsync(model, mapper)
+                      .ConfigureAwait(true);
         }
 
-        public Task DeleteByKeyAsync(TKey key)
+        public Task DeleteByKeyAsync(IntKey key)
         {
-            throw new NotSupportedException();
+            this.collection.Remove(key);
+
+            return Task.CompletedTask;
         }
     }
-
-#pragma warning disable CA1812
-    private sealed class Manager<TModel, TKey>(IGrantStore<TModel, TKey> store) : GrantManager<TModel, TKey>(store)
-#pragma warning restore CA1812
-        where TModel : GrantModel<TKey>
-        where TKey : IEquatable<TKey>;
-
-#pragma warning disable CA1812
-    private sealed class ManagerStore<TModel, TKey>(IGrantStore<TModel, TKey> store) : GrantManager<TModel, TKey>(store)
-#pragma warning restore CA1812
-        where TModel : GrantModel<TKey>
-        where TKey : IEquatable<TKey>;
 
 #pragma warning disable CA1812
     internal sealed class Model(IntKey key, IEnumerable<string> scopes) : GrantModel<IntKey>(key)
@@ -690,60 +708,6 @@ public sealed class GrantManagementTests
             }
 
             return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
-
-#pragma warning disable CA1812
-    internal sealed class Store : IGrantStore<Model, IntKey>
-#pragma warning restore CA1812
-    {
-        private readonly Dictionary<IntKey, Model> collection = new();
-
-        public Task<PagedResultSet<Model>> GetAllAsync(int pageIndex, int pageSize, IGrantFilter? filter)
-        {
-            IQueryable<KeyValuePair<IntKey, Model>> dataSet = this.collection.AsQueryable();
-
-            if (filter != null)
-            {
-                dataSet = dataSet.AsEnumerable()
-                                 .Where(filter.Create<Func<KeyValuePair<IntKey, Model>, bool>>())
-                                 .AsQueryable();
-            }
-
-            IEnumerable<Model> grants = dataSet.Skip(pageIndex * pageSize)
-                                               .Take(pageSize)
-                                               .Select(static kvp => kvp.Value);
-
-            var result = new PagedResultSet<Model>(grants, this.collection.Count > (pageIndex + 1) * pageSize);
-
-            return Task.FromResult(result);
-        }
-
-        public Task<IntKey> CreateAsync(Model model, IGrantOperationMapper mapper)
-        {
-            this.collection.Add(model.Key, mapper.Create<Model, Model>(model));
-
-            return Task.FromResult(model.Key);
-        }
-
-        public async Task UpdateAsync(IntKey key, Model model, IGrantOperationMapper mapper)
-        {
-            if (!this.collection.ContainsKey(key))
-            {
-                throw new UpdateException($"Custom: Failed to update client grant: `{key}`. Not found.");
-            }
-
-            this.collection.Remove(key);
-
-            await this.CreateAsync(model, mapper)
-                      .ConfigureAwait(true);
-        }
-
-        public Task DeleteByKeyAsync(IntKey key)
-        {
-            this.collection.Remove(key);
-
-            return Task.CompletedTask;
         }
     }
 

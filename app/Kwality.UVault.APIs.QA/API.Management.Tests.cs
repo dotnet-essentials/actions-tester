@@ -135,14 +135,14 @@ public sealed class ApiManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
@@ -155,15 +155,15 @@ public sealed class ApiManagementTests
     internal void UseCustomManagerAsSingleton_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseApiManagement<Model, IntKey>(static options => { options.UseManager<Manager<Model, IntKey>>(); },
+        services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(
+            static options => { options.UseManager<Manager>(); },
                 ServiceLifetime.Singleton));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
@@ -176,15 +176,15 @@ public sealed class ApiManagementTests
     internal void UseCustomManagerAsScoped_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseApiManagement<Model, IntKey>(static options => { options.UseManager<Manager<Model, IntKey>>(); },
+        services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(
+            static options => { options.UseManager<Manager>(); },
                 ServiceLifetime.Scoped));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
@@ -197,15 +197,15 @@ public sealed class ApiManagementTests
     internal void UseCustomManagerAsTransient_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options =>
-            options.UseApiManagement<Model, IntKey>(static options => { options.UseManager<Manager<Model, IntKey>>(); },
+        services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(
+            static options => { options.UseManager<Manager>(); },
                 ServiceLifetime.Transient));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
@@ -220,7 +220,7 @@ public sealed class ApiManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseStore<Store>();
         }));
 
         // ASSERT.
@@ -232,7 +232,7 @@ public sealed class ApiManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -243,7 +243,7 @@ public sealed class ApiManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Singleton);
+            options.UseStore<Store>(ServiceLifetime.Singleton);
         }));
 
         // ASSERT.
@@ -255,7 +255,7 @@ public sealed class ApiManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Singleton &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -266,7 +266,7 @@ public sealed class ApiManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Scoped);
+            options.UseStore<Store>(ServiceLifetime.Scoped);
         }));
 
         // ASSERT.
@@ -278,7 +278,7 @@ public sealed class ApiManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -289,7 +289,7 @@ public sealed class ApiManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Transient);
+            options.UseStore<Store>(ServiceLifetime.Transient);
         }));
 
         // ASSERT.
@@ -301,7 +301,7 @@ public sealed class ApiManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IApiStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Transient &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -329,12 +329,12 @@ public sealed class ApiManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ACT.
-        Func<Manager<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                         .GetRequiredService<Manager<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -349,13 +349,13 @@ public sealed class ApiManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseApiManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<ManagerStore<Model, IntKey>>();
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseManager<Manager>();
+            options.UseStore<Store>();
         }));
 
         // ACT.
-        Func<ManagerStore<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                              .GetRequiredService<ManagerStore<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -443,58 +443,8 @@ public sealed class ApiManagementTests
     }
 
 #pragma warning disable CA1812
-    private sealed class Store<TModel, TKey> : IApiStore<TModel, TKey>
+    private sealed class Manager(IApiStore<Model, IntKey> store) : ApiManager<Model, IntKey>(store);
 #pragma warning restore CA1812
-        where TModel : ApiModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        public Task<TModel> GetByKeyAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<TKey> CreateAsync(TModel model, IApiOperationMapper mapper)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task DeleteByKeyAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
-#pragma warning disable CA1812
-    private sealed class Manager<TModel, TKey>(IApiStore<TModel, TKey> store) : ApiManager<TModel, TKey>(store)
-#pragma warning restore CA1812
-        where TModel : ApiModel<TKey>
-        where TKey : IEquatable<TKey>;
-
-#pragma warning disable CA1812
-    private sealed class ManagerStore<TModel, TKey>(IApiStore<TModel, TKey> store) : ApiManager<TModel, TKey>(store)
-#pragma warning restore CA1812
-        where TModel : ApiModel<TKey>
-        where TKey : IEquatable<TKey>;
-
-#pragma warning disable CA1812
-    internal sealed class Model(IntKey name) : ApiModel<IntKey>(name);
-#pragma warning restore CA1812
-
-    private sealed class CreateOperationMapper : IApiOperationMapper
-    {
-        public TDestination Create<TSource, TDestination>(TSource source)
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(TSource))
-            {
-                throw new CreateException(
-                    $"Invalid {nameof(IApiOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
-            }
-
-            return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
-
 #pragma warning disable CA1812
     private sealed class Store : IApiStore<Model, IntKey>
 #pragma warning restore CA1812
@@ -523,6 +473,25 @@ public sealed class ApiManagementTests
             this.collection.Remove(key);
 
             return Task.CompletedTask;
+        }
+    }
+
+#pragma warning disable CA1812
+    internal sealed class Model(IntKey name) : ApiModel<IntKey>(name);
+#pragma warning restore CA1812
+
+    private sealed class CreateOperationMapper : IApiOperationMapper
+    {
+        public TDestination Create<TSource, TDestination>(TSource source)
+            where TDestination : class
+        {
+            if (typeof(TDestination) != typeof(TSource))
+            {
+                throw new CreateException(
+                    $"Invalid {nameof(IApiOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
+            }
+
+            return source.UnsafeAs<TSource, TDestination>();
         }
     }
 

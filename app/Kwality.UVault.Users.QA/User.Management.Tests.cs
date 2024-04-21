@@ -136,14 +136,14 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -157,14 +157,14 @@ public sealed class UserManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseUserManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Singleton));
+            options.UseUserManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Singleton));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -178,14 +178,14 @@ public sealed class UserManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseUserManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Scoped));
+            options.UseUserManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Scoped));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -199,14 +199,14 @@ public sealed class UserManagementTests
     {
         // ARRANGE.
         services.AddUVault(static options =>
-            options.UseUserManagement<Model, IntKey>(
-                static options => { options.UseManager<Manager<Model, IntKey>>(); }, ServiceLifetime.Transient));
+            options.UseUserManagement<Model, IntKey>(static options => { options.UseManager<Manager>(); },
+                ServiceLifetime.Transient));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager<Model, IntKey>) &&
+                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(Manager) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Manager<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Manager));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -221,7 +221,7 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseStore<Store>();
         }));
 
         // ASSERT.
@@ -234,7 +234,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -245,7 +245,7 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Singleton);
+            options.UseStore<Store>(ServiceLifetime.Singleton);
         }));
 
         // ASSERT.
@@ -258,7 +258,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Singleton &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -269,7 +269,7 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Scoped);
+            options.UseStore<Store>(ServiceLifetime.Scoped);
         }));
 
         // ASSERT.
@@ -282,7 +282,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -293,7 +293,7 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
         {
-            options.UseStore<Store<Model, IntKey>>(ServiceLifetime.Transient);
+            options.UseStore<Store>(ServiceLifetime.Transient);
         }));
 
         // ASSERT.
@@ -306,7 +306,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Transient &&
-                                                    descriptor.ImplementationType == typeof(Store<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(Store));
     }
 
     [AutoDomainData]
@@ -317,15 +317,16 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
-            options.UseDataStore<DataStore<Model, IntKey>, Model>();
+            options.UseDataStore<DataStore, Model>();
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                .ContainSingle(static descriptor =>
+                    descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
                                                     descriptor.ImplementationType ==
-                                                    typeof(UserManager<Model, IntKey>));
+                    typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -334,7 +335,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(DataStore));
     }
 
     [AutoDomainData]
@@ -345,15 +346,16 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
-            options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Singleton);
+            options.UseDataStore<DataStore, Model>(ServiceLifetime.Singleton);
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                .ContainSingle(static descriptor =>
+                    descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
                                                     descriptor.ImplementationType ==
-                                                    typeof(UserManager<Model, IntKey>));
+                    typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -362,7 +364,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Singleton &&
-                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(DataStore));
     }
 
     [AutoDomainData]
@@ -373,15 +375,16 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
-            options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Scoped);
+            options.UseDataStore<DataStore, Model>(ServiceLifetime.Scoped);
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                .ContainSingle(static descriptor =>
+                    descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
                                                     descriptor.ImplementationType ==
-                                                    typeof(UserManager<Model, IntKey>));
+                    typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -390,7 +393,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
-                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(DataStore));
     }
 
     [AutoDomainData]
@@ -399,17 +402,18 @@ public sealed class UserManagementTests
     internal void UseCustomDataStoreAsTransient_AddsServices(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
-            options.UseDataStore<DataStore<Model, IntKey>, Model>(ServiceLifetime.Transient);
+            options.UseDataStore<DataStore, Model>(ServiceLifetime.Transient);
         }));
 
         // ASSERT.
         services.Should()
-                .ContainSingle(static descriptor => descriptor.ServiceType == typeof(UserManager<Model, IntKey>) &&
+                .ContainSingle(static descriptor =>
+                    descriptor.ServiceType == typeof(UserManager<Model, IntKey, Model>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Scoped &&
                                                     descriptor.ImplementationType ==
-                                                    typeof(UserManager<Model, IntKey>));
+                    typeof(UserManager<Model, IntKey, Model>));
 
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserStore<Model, IntKey>) &&
@@ -418,7 +422,7 @@ public sealed class UserManagementTests
         services.Should()
                 .ContainSingle(static descriptor => descriptor.ServiceType == typeof(IUserDataStore<Model, IntKey>) &&
                                                     descriptor.Lifetime == ServiceLifetime.Transient &&
-                                                    descriptor.ImplementationType == typeof(DataStore<Model, IntKey>));
+                                                    descriptor.ImplementationType == typeof(DataStore));
     }
 
     [AutoDomainData]
@@ -444,14 +448,14 @@ public sealed class UserManagementTests
     internal void ResolveCustomManager_RaisesNoException(IServiceCollection services)
     {
         // ARRANGE.
-        services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
+        services.AddUVault(static options => options.UseUserManagement<Model, IntKey, Model>(static options =>
         {
-            options.UseManager<Manager<Model, IntKey>>();
+            options.UseManager<Manager>();
         }));
 
         // ACT.
-        Func<Manager<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                         .GetRequiredService<Manager<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -466,13 +470,13 @@ public sealed class UserManagementTests
         // ARRANGE.
         services.AddUVault(static options => options.UseUserManagement<Model, IntKey>(static options =>
         {
-            options.UseManager<ManagerStore<Model, IntKey>>();
-            options.UseStore<Store<Model, IntKey>>();
+            options.UseManager<Manager>();
+            options.UseStore<Store>();
         }));
 
         // ACT.
-        Func<ManagerStore<Model, IntKey>> act = () => services.BuildServiceProvider()
-                                                              .GetRequiredService<ManagerStore<Model, IntKey>>();
+        Func<Manager> act = () => services.BuildServiceProvider()
+                                          .GetRequiredService<Manager>();
 
         // ASSERT.
         act.Should()
@@ -701,105 +705,10 @@ public sealed class UserManagementTests
     }
 
 #pragma warning disable CA1812
-    private sealed class Store<TModel, TKey> : IUserStore<TModel, TKey>
+    private sealed class Manager(IUserStore<Model, IntKey> store) : UserManager<Model, IntKey>(store);
 #pragma warning restore CA1812
-        where TModel : UserModel<TKey>
-        where TKey : IEquatable<TKey>
-    {
-        public Task<TModel> GetByKeyAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<IEnumerable<TModel>> GetByEmailAsync(string email)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<TKey> CreateAsync(TModel model, IUserOperationMapper mapper)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task UpdateAsync(TKey key, TModel model, IUserOperationMapper mapper)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task DeleteByKeyAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
 #pragma warning disable CA1812
-    private sealed class DataStore<TData, TKey> : IUserDataStore<TData, TKey>
-        where TData : class
-        where TKey : IEquatable<TKey>
-#pragma warning restore CA1812
-    {
-        public Task CreateAsync(TKey key, TData data)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task UpdateAsync(TKey key, TData data)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task DeleteAsync(TKey key)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
-#pragma warning disable CA1812
-    private sealed class Manager<TModel, TKey>(IUserStore<TModel, TKey> store) : UserManager<TModel, TKey>(store)
-#pragma warning restore CA1812
-        where TModel : UserModel<TKey>
-        where TKey : IEquatable<TKey>;
-
-#pragma warning disable CA1812
-    private sealed class ManagerStore<TModel, TKey>(IUserStore<TModel, TKey> store) : UserManager<TModel, TKey>(store)
-#pragma warning restore CA1812
-        where TModel : UserModel<TKey>
-        where TKey : IEquatable<TKey>;
-
-    internal sealed class Model(IntKey key, string email) : UserModel<IntKey>(key, email);
-
-    private sealed class CreateOperationMapper : IUserOperationMapper
-    {
-        public TDestination Create<TSource, TDestination>(TSource source)
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(TSource))
-            {
-                throw new CreateException(
-                    $"Invalid {nameof(IUserOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
-            }
-
-            return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
-
-    private sealed class UpdateOperationMapper : IUserOperationMapper
-    {
-        public TDestination Create<TSource, TDestination>(TSource source)
-            where TDestination : class
-        {
-            if (typeof(TDestination) != typeof(TSource))
-            {
-                throw new UpdateException(
-                    $"Invalid {nameof(IUserOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
-            }
-
-            return source.UnsafeAs<TSource, TDestination>();
-        }
-    }
-
-#pragma warning disable CA1812
-    internal sealed class Store : IUserStore<Model, IntKey>
+    private sealed class Store : IUserStore<Model, IntKey>
 #pragma warning restore CA1812
     {
         private readonly Dictionary<IntKey, Model> collection = new();
@@ -851,6 +760,58 @@ public sealed class UserManagementTests
             this.collection.Remove(key);
 
             return Task.CompletedTask;
+        }
+    }
+#pragma warning disable CA1812
+    private sealed class DataStore : IUserDataStore<Model, IntKey>
+
+#pragma warning restore CA1812
+    {
+        public Task CreateAsync(IntKey key, Model data)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task UpdateAsync(IntKey key, Model data)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task DeleteAsync(IntKey key)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    internal sealed class Model(IntKey key, string email) : UserModel<IntKey>(key, email);
+
+    private sealed class CreateOperationMapper : IUserOperationMapper
+    {
+        public TDestination Create<TSource, TDestination>(TSource source)
+            where TDestination : class
+        {
+            if (typeof(TDestination) != typeof(TSource))
+            {
+                throw new CreateException(
+                    $"Invalid {nameof(IUserOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
+            }
+
+            return source.UnsafeAs<TSource, TDestination>();
+        }
+    }
+
+    private sealed class UpdateOperationMapper : IUserOperationMapper
+    {
+        public TDestination Create<TSource, TDestination>(TSource source)
+            where TDestination : class
+        {
+            if (typeof(TDestination) != typeof(TSource))
+            {
+                throw new UpdateException(
+                    $"Invalid {nameof(IUserOperationMapper)}: Destination is NOT `{nameof(TSource)}`.");
+            }
+
+            return source.UnsafeAs<TSource, TDestination>();
         }
     }
 
